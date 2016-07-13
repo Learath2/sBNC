@@ -16,7 +16,7 @@ int srv_init()
 
 int srv_connect(char *server)
 {
-	//TODO: turn host:port into int port char host
+	//TODO: turn host:port into int port, char *host
 	struct sockaddr_in srv_addr;
 
 	memset(srv_addr, 0, sizeof srv_addr);
@@ -27,12 +27,10 @@ int srv_connect(char *server)
 	return (g_state = connect(g_socket, (struct sockaddr *)&srv_addr, sizeof srv_addr));
 }
 
-srv_state_t srv_state()
-{
-	return g_state;
-}
+srv_state_t srv_state(){ return g_state; }
+int srv_socket(){ return g_socket; }
 
-int srv_socket()
+void srv_process_message(int *syn, char **tokarr, int ntok)
 {
-	return g_socket;
+
 }

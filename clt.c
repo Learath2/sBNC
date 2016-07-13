@@ -36,7 +36,7 @@ int clt_accept()
 	return accept(g_socket, NULL, NULL);
 }
 
-void clt_process_msg(int fd, char **tokarr, int ntok)
+void clt_process_msg(int fd, int *syn, char **tokarr, int ntok)
 {
 	if()
 }

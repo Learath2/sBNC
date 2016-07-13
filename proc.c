@@ -49,30 +49,11 @@ void proc_wqueue_next()
 	free(t);
 }
 
-size_t proc_wqueue_length()
-{
-	return g_wqueue.length;
-}
-
-wqueue_entry_t *proc_wqueue_head()
-{
-	return g_wqueue.head;
-}
-
-int proc_wqueue_entry_target(wqueue_entry_t d)
-{
-	return d->target;
-}
-
-void *proc_wqueue_entry_data(wqueue_entry_t d)
-{
-	return d->data;
-}
-
-size_t proc_wqueue_entry_datasz(wqueue_entry_t d)
-{
-	return d->datasz;
-}
+size_t proc_wqueue_length(){ return g_wqueue.length; }
+wqueue_entry_t *proc_wqueue_head(){ return g_wqueue.head; }
+int proc_wqueue_entry_target(wqueue_entry_t d){	return d->target; }
+void *proc_wqueue_entry_data(wqueue_entry_t d){	return d->data; }
+size_t proc_wqueue_entry_datasz(wqueue_entry_t d){ return d->datasz; }
 
 void proc_tick()
 {
@@ -84,8 +65,11 @@ void proc_read(int fd, char *buf, size_t bufsize, int len)
 	char *tokarr[64] = {NULL};
 	int ntok = util_tokenize(buf, bufsize, tokarr, COUNT_OF(tokarr));
 
+	int syntax[SYNELEM];
+	util_msg_syntax(tokarr, ntok);
+
 	if(fd == srv_socket()) //Msg from server
-		srv_process_msg(fd, tokarr, ntok);
+		srv_process_msg(syntax, tokarr, ntok);
 	else //Msg from client
-		clt_process_msg(fd, tokarr, ntok);
+		clt_process_msg(fd, syntax, tokarr, ntok);
 }
