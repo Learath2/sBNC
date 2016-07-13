@@ -51,8 +51,8 @@ void proc_wqueue_next()
 
 size_t proc_wqueue_length(){ return g_wqueue.length; }
 wqueue_entry_t *proc_wqueue_head(){ return g_wqueue.head; }
-int proc_wqueue_entry_target(wqueue_entry_t d){	return d->target; }
-void *proc_wqueue_entry_data(wqueue_entry_t d){	return d->data; }
+int proc_wqueue_entry_target(wqueue_entry_t d){ return d->target; }
+void *proc_wqueue_entry_data(wqueue_entry_t d){ return d->data; }
 size_t proc_wqueue_entry_datasz(wqueue_entry_t d){ return d->datasz; }
 
 void proc_tick()
