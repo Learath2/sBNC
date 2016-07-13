@@ -32,5 +32,9 @@ int srv_socket(){ return g_socket; }
 
 void srv_process_message(int *syn, char **tokarr, int ntok)
 {
-
+	if(!strcmp(tokarr[syn[CMD]], "PING")){
+		char buf[512];
+		sprintf(buf, "PONG :%s", (syn[TRAILING] > 0) ? tokarr[syn[TRAILING]] : tokarr[syn[CMD] + 1])
+		proc_wqueue_add(g_socket, buf, strlen(buf));
+	}
 }
