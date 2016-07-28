@@ -36,7 +36,7 @@ void srv_message_process(char *buf)
 	char *tokarr[MAX_TOKENS] = {0};
 	int ntok = util_tokenize(tmp, tokarr, COUNT_OF(tokarr));
 	struct irc_message m = util_irc_message_parse(tokarr, ntok);
-	bool me = !strcmp(m.prefix.nick, state_nick_get());
+	bool me = !strcmp(m.prefix.nick, state_nick());
 
 	if(me && !strcmp(m.tokarr[m.cmd], "JOIN")){
 		for(int i = m.middle; i < m.ntok; i++){
@@ -50,6 +50,13 @@ void srv_message_process(char *buf)
 		for(int i = m.middle; i < m.ntok; i++)
 			if(m.tokarr[i][0] == '#' || m.tokarr[i][0] == '&')
 				state_channel_part(tokarr[i]);
+	}
+	else if(me && !strcmp(m.tokarr[m.cmd], "004")){
+		state_server_umodes_set(m.tokarr[m.middle + 3]);
+		state_server_cmodes_set(m.tokarr[m.middle + 4]);
+	}
+	else if(me && !strcmp(m.tokarr[m.cmd], "005")){
+		state_server_005_store(buf);
 	}
 
 	clt_send_message(-1, msg, strlen(buf));

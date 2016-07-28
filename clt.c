@@ -1,4 +1,5 @@
 #include "clt.h"
+#include "core.h"
 
 #define BACKLOG 10
 #define MAX_CLIENTS 10
@@ -78,14 +79,14 @@ void clt_tick()
 			case CLIENT_STATE_EMPTY:
 				continue;
 			case CLIENT STATE_INIT:
-				SF(":%s 001 %s :Welcome to sBNC, %s", core_host(), state_nick_get(), state_nick_get());
-				SF(":%s 002 %s :Your host is %s, running version %s", core_host(), state_nick_get(), core_host(), core_version());
-				SF(":%s 003 %s :This server was created %s", core_host(), state_nick_get(), core_epoch());
-				SF(":%s 004 %s :%s %s %s %s", core_host(), state_nick_get(), core_host(), core_version(), state_server_umodes(), state_server_cmodes());
+				SF(":%s 001 %s :Welcome to sBNC, %s", core_host(), state_nick(), state_nick());
+				SF(":%s 002 %s :Your host is %s, running version %s", core_host(), state_nick(), core_host(), core_version());
+				SF(":%s 003 %s :This server was created %s", core_host(), state_nick(), core_epoch());
+				SF(":%s 004 %s :%s %s %s %s", core_host(), state_nick(), core_host(), core_version(), state_server_umodes(), state_server_cmodes());
 				state_server_005(i);
 				srv_message_sendf("LUSERS"); //Need to route the replies somehow
 				srv_message_sendf("MOTD");   //ditto
-				state_channel_new_client(i);
+				state_channel_client_init(i);
 				g_clients[i].state = CLIENT_STATE_READY;
 				break;
 		}

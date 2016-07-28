@@ -9,6 +9,13 @@
 #define LISTENER 0
 #define SERVER 1
 #define POLLTIMEOUT 1 * 60 * 1000
+#define DATESIZE 64
+
+const char g_version[] = "sBNC version -1";
+char g_epoch[DATESIZE];
+
+const char *core_version() { return g_version; }
+const char *core_epoch() { return g_epoch; }
 
 int main(int argc, char **argv)
 {

@@ -1,6 +1,12 @@
 #include "state.h"
 
 #define MAX_CHANNELS 20
+#define MAX_005LINES 5
+
+char g_sumodes[32];
+char g_scmodes[32];
+char g_005[MAX_005LINES][513];
+int g_n005 = 0;
 
 char g_nick[10];
 char g_channels[MAX_CHANNELS][200] = {0};
@@ -14,7 +20,33 @@ bool state_nick_set(char *nick)
 	return true;
 }
 
-const char *state_nick_get() { return g_nick; }
+const char *state_nick() { return g_nick; }
+const char *state_server_umodes() { return g_sumodes; }
+const char *state_server_cmodes() { return g_scmodes; }
+
+void state_server_umodes_set(char *s)
+{
+	strncpy(g_sumodes, s, sizeof g_sumodes);
+}
+
+void state_server_cmodes_set(char *s)
+{
+	strncpy(g_sumodes, s, sizeof g_scmodes);
+}
+
+void state_server_005_store(char *s)
+{
+	if(g_n005 == MAX_005LINES) //IDK wat do
+		return;
+
+	strcpy(g_005[g_n005++], s); //Probably need to modify this a bit
+}
+
+void state_server_005(int id)
+{
+	for(int i = 0; i < g_n005; i++)
+		clt_message_send(g_005[i], strlen(g_005[i]));
+}
 
 void state_channel_join(char *chan)
 {
@@ -38,7 +70,7 @@ void state_channel_part(char *chan)
 	g_nchannels--;
 }
 
-void state_channel_new_client(int id)
+void state_channel_client_init(int id)
 {
 	for(int i = 0; i < MAX_CHANNELS; i++){
 		if(g_channels[i][0] != '\0'){
