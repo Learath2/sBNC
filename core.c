@@ -1,28 +1,19 @@
 #include <stdio.h>
 
-#include <libleaconfig/leaconfig.h>
-
 #include "core.h"
 #include "srv.h"
 #include "clt.h"
 #include "proc.h"
+#include "state.h"
 
 #define LISTENER 0
 #define SERVER 1
 #define POLLTIMEOUT 1 * 60 * 1000
 
-config_t g_config = NULL;
-
 int main(int argc, char **argv)
 {
 	int nfds = 0, s_server = 0, s_listener = 0;
 	struct pollfd fds[MAX_SOCKETS];
-
-	get_config_filename(&argc, &argv);
-
-	g_config = config_init();
-	config_set_config(g_config);
-	config_set_filename("STH"); //TODO: Check args, if not try bnc.conf, else create a new one
 
 	process_args(&argc, &argv);
 	
