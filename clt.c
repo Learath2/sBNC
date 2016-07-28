@@ -68,6 +68,33 @@ int clt_init(int port)
 	return g_socket;
 }
 
+void clt_tick()
+{
+	#define SF(...) clt_message_sendf(__VA_VARGS__)
+	#define SN(DATA, SZ) clt_message_send(DATA, SZ)
+
+	for(int i = 0; i < MAX_CLIENTS; i++){
+		switch g_clients[i].state{
+			case CLIENT_STATE_EMPTY:
+				continue;
+			case CLIENT STATE_INIT:
+				SF(":%s 001 %s :Welcome to sBNC, %s", core_host(), state_nick_get(), state_nick_get());
+				SF(":%s 002 %s :Your host is %s, running version %s", core_host(), state_nick_get(), core_host(), core_version());
+				SF(":%s 003 %s :This server was created %s", core_host(), state_nick_get(), core_epoch());
+				SF(":%s 004 %s :%s %s %s %s", core_host(), state_nick_get(), core_host(), core_version(), state_server_umodes(), state_server_cmodes());
+				state_server_005(i);
+				srv_message_sendf("LUSERS"); //Need to route the replies somehow
+				srv_message_sendf("MOTD");   //ditto
+				state_channel_new_client(i);
+				g_clients[i].state = CLIENT_STATE_READY;
+				break;
+		}
+	}
+
+	#undef SF
+	#undef SN
+}
+
 int clt_accept()
 {
 	if(g_nclients == MAX_CLIENTS)
@@ -78,6 +105,18 @@ int clt_accept()
 void clt_message_process(int fd, char *buf)
 {
 	srv_send_msg(buf, strlen(buf));
+}
+
+void clt_message_sendf(int id, const char *format, ... )
+{
+	char buf[513];
+	va_list args;
+	va_start(args, format);
+	int n = vsnprintf(buf, sizeof buf, format, args);
+	va_end(args);
+
+	if(n < buf)
+		clt_message_send(id, buf, n);
 }
 
 void clt_message_send(int id, void *data, size_t datasz)

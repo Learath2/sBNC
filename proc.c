@@ -57,7 +57,7 @@ size_t proc_wqueue_entry_datasz(wqueue_entry_t d){ return d->datasz; }
 
 void proc_tick()
 {
-
+	clt_tick();
 }
 
 void proc_read(int fd, char *buf)

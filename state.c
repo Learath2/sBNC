@@ -14,6 +14,8 @@ bool state_nick_set(char *nick)
 	return true;
 }
 
+const char *state_nick_get() { return g_nick; }
+
 void state_channel_join(char *chan)
 {
 	for(int i = 0; i < MAX_CHANNELS; i++)
@@ -34,4 +36,14 @@ void state_channel_part(char *chan)
 {
 	g_channels[state_channel_joined(chan)][0] = '\0';
 	g_nchannels--;
+}
+
+void state_channel_new_client(int id)
+{
+	for(int i = 0; i < MAX_CHANNELS; i++){
+		if(g_channels[i][0] != '\0'){
+			clt_message_sendf(id, ":%s!%s@%s JOIN %s", g_nick, g_user, core_host(), g_channels[i]);
+			srv_message_sendf("NAMES %s", g_channels[i]); //Need to route the replies
+		}
+	}
 }

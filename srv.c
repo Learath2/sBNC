@@ -32,7 +32,39 @@ int srv_socket(){ return g_socket; }
 
 void srv_message_process(char *buf)
 {
+	char *tmp = util_strdup(buf);
+	char *tokarr[MAX_TOKENS] = {0};
+	int ntok = util_tokenize(tmp, tokarr, COUNT_OF(tokarr));
+	struct irc_message m = util_irc_message_parse(tokarr, ntok);
+	bool me = !strcmp(m.prefix.nick, state_nick_get());
+
+	if(me && !strcmp(m.tokarr[m.cmd], "JOIN")){
+		for(int i = m.middle; i < m.ntok; i++){
+			if(m.tokarr[i][0] == '#' || m.tokarr[i][0] == '&')
+				state_channel_join(tokarr[i]);
+			else
+				break;
+		}
+	}
+	else if(me && !strcmp(m.tokarr[m.cmd], "PART")){
+		for(int i = m.middle; i < m.ntok; i++)
+			if(m.tokarr[i][0] == '#' || m.tokarr[i][0] == '&')
+				state_channel_part(tokarr[i]);
+	}
+
 	clt_send_message(-1, msg, strlen(buf));
+}
+
+void srv_message_sendf(const char *format, ... )
+{
+	char buf[513];
+	va_list args;
+	va_start(args, format);
+	int n = vsnprintf(buf, sizeof buf, format, args);
+	va_end(args);
+
+	if(n > 0 && n < buf)
+		srv_message_send(buf, n);
 }
 
 void srv_message_send(void *data, size_t datasz)
