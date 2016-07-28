@@ -23,18 +23,19 @@ int srv_connect(char *server)
 	srv_addr.sin_family		= AF_INET;
 	srv_addr.sin_port		= htons(port);
 	inet_pton(AF_INET, host, &srv_addr.sin_addr);
-
+	
 	return (g_state = connect(g_socket, (struct sockaddr *)&srv_addr, sizeof srv_addr));
 }
 
 srv_state_t srv_state(){ return g_state; }
 int srv_socket(){ return g_socket; }
 
-void srv_process_message(int *syn, char **tokarr, int ntok)
+void srv_message_process(char *buf)
 {
-	if(!strcmp(tokarr[syn[CMD]], "PING")){
-		char buf[512];
-		sprintf(buf, "PONG :%s", (syn[TRAILING] > 0) ? tokarr[syn[TRAILING]] : tokarr[syn[CMD] + 1])
-		proc_wqueue_add(g_socket, buf, strlen(buf));
-	}
+	clt_send_message(-1, msg, strlen(buf));
+}
+
+void srv_message_send(void *data, size_t datasz)
+{
+	proc_wqueue_add(g_socket, data, datasz);
 }

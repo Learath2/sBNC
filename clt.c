@@ -1,13 +1,44 @@
 #include "clt.h"
 
 #define BACKLOG 10
+#define MAX_CLIENTS 10
 
-int g_socket;
+int g_socket = -1;
 clt_state_t g_state = -1;
+int g_nclients = 0;
+struct client g_clients[MAX_CLIENTS];
 
-clt_state_t clt_state()
+clt_state_t clt_state() { return g_state; }
+
+int clt_clients_get_id(int fd)
 {
-	return g_state;
+	for(int i = 0; i < MAX_CLIENTS; i++)
+		if(g_clients[i].fd == fd)
+			return i;
+}
+
+int clt_clients_add(int fd)
+{
+	for(int i = 0; i < MAX_CLIENTS; i++){
+		if(g_clients[i].fd == -1){
+			g_clients[i].fd = fd;
+			g_clients[i].state = CLIENT_STATE_INIT;
+			g_nclients++;
+			break;
+		}
+	}
+	return fd;
+}
+
+void clt_clients_remove_id(int id)
+{
+	g_clients[id].fd = -1;
+	g_clients[id].state = CLIENT_STATE_EMPTY;
+}
+
+void clt_clients_remove_fd(int fd)
+{
+	clt_clients_remove_id(clt_clients_get_id(fd));
 }
 
 //TODO: Check for errors :P
@@ -28,15 +59,32 @@ int clt_init(int port)
 	bind(g_socket, (struct sockaddr *)&clt_addr, sizeof clt_addr);
 
 	listen(g_socket, BACKLOG);
+
+	for(int i = 0; i < MAX_CLIENTS; i++){
+		g_clients[i].fd = -1;
+		g_clients[i].state = CLIENT_STATE_EMPTY;
+	}
 	return g_socket;
 }
 
 int clt_accept()
 {
-	return accept(g_socket, NULL, NULL);
+	if(g_nclients == MAX_CLIENTS)
+		return -2;
+	return clt_clients_add(accept(g_socket, NULL, NULL));
 }
 
-void clt_process_msg(int fd, int *syn, char **tokarr, int ntok)
+void clt_message_process(int fd, char *buf)
 {
-	if()
+	srv_send_msg(buf, strlen(buf));
+}
+
+void clt_message_send(int id, void *data, size_t datasz)
+{
+	if(fd > 0)
+		proc_wqueue_add(g_clients[id].fd, data, datasz);
+	else
+		for(int i = 0; i < MAX_CLIENTS; i++)
+			if(g_clients[i].fd != -1)
+				proc_wqueue_add(g_clients[i].fd, data, datasz);
 }

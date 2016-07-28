@@ -60,16 +60,10 @@ void proc_tick()
 
 }
 
-void proc_read(int fd, char *buf, size_t bufsize, int len)
+void proc_read(int fd, char *buf)
 {
-	char *tokarr[64] = {NULL};
-	int ntok = util_tokenize(buf, bufsize, tokarr, COUNT_OF(tokarr));
-
-	int syntax[SYNELEM];
-	util_msg_syntax(tokarr, ntok);
-
-	if(fd == srv_socket()) //Msg from server
-		srv_process_msg(syntax, tokarr, ntok);
-	else //Msg from client
-		clt_process_msg(fd, syntax, tokarr, ntok);
+	if(fd == srv_socket())
+		srv_process_message(buf);
+	else
+		clt_process_message(fd, buf);
 }

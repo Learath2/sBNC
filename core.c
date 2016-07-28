@@ -60,7 +60,8 @@ int main(int argc, char **argv)
 					int len = 0;
 					if((len = recv(fds[i].fd, buffer, sizeof buffer, 0)) < 0)
 						break;
-					proc_read(fds[i].fd, buffer, sizeof buffer, len);
+					buffer[len+1] = '\0'; //Ensure NULL Termination
+					proc_read(fds[i].fd, buffer);
 				}
 			}
 		}

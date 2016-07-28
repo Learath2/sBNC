@@ -25,10 +25,3 @@ size_t util_tokenize(char *buffer, size_t bufsize, char **tokarr, size_t toksize
 	}
 	return ntok;
 }
-
-void util_msg_syntax(int *syntax, char **tokarr, size_t ntok)
-{
-	syntax[PREFIX] = (tokarr[0][0] == ':') ? 0 : -1;
-	syntax[CMD] = syntax[PREFIX] + 1;
-	syntax[TRAILING] = (tokarr[ntok - 1][0] == ':') ? ntok - 1 : -1;
-}
