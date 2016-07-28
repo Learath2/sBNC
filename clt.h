@@ -10,6 +10,7 @@ typedef enum{
 struct client{
 	int fd;
 	client_state_t state;
+	int lastping;
 };
 
 int clt_clients_get_id(int fd);

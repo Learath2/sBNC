@@ -63,6 +63,7 @@ int clt_init(int port)
 	for(int i = 0; i < MAX_CLIENTS; i++){
 		g_clients[i].fd = -1;
 		g_clients[i].state = CLIENT_STATE_EMPTY;
+		g_clients[i].lastping = 0;
 	}
 	return g_socket;
 }
