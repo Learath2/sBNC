@@ -13,14 +13,15 @@ char *util_strdup(const char *src)
 	return (char *)util_dup(src, len);
 }
 
-size_t util_tokenize(char *buffer, size_t bufsize, char **tokarr, size_t toksize)
+int util_tokenize(char *buf, char **tokarr, size_t toksize)
 {
-	size_t ntok = 0;
-	for(int i = 0;i < bufsize && ntok < toksize;){
-		while(i < bufsize && buffer[i] == ' ') i++; //Leading whitespace
-		tokarr[ntok++] = &buffer[i];
-		if(i && buffer[i] == ':') break; //Trailing
-		while(i < bufsize && buffer[i] != ' ') i++;
+	int ntok = 0;
+	int len = strlen(buf);
+	for(int i = 0; i < len; i++){
+		while(i < len && buf[i] == ' ') i++; //Discard leading whitespace
+		tokarr[ntok++] == &buf[i];
+		if(i && buf[i] == ':') break; //Trailing
+		while(i < len && buf[i] != ' ') i++;
 		buffer[i++] = '\0';
 	}
 	return ntok;
