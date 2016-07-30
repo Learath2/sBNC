@@ -4,7 +4,8 @@ typedef enum{
 
 typedef enum{
 	CLIENT_STATE_EMPTY = -1,
-	CLIENT_STATE_INIT = 0,
+	CLIENT_STATE_REGISTER = 0,
+	CLIENT_STATE_INIT,
 	CLIENT_STATE_READY
 } client_state_t;
 
@@ -12,6 +13,8 @@ struct client{
 	int fd;
 	client_state_t state;
 	int lastping;
+	bool auth;
+	char *username;
 };
 
 int clt_clients_get_id(int fd);

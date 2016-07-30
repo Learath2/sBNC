@@ -71,13 +71,15 @@ int clt_init(int port)
 
 void clt_tick()
 {
-	#define SF(...) clt_message_sendf(__VA_VARGS__)
-	#define SN(DATA, SZ) clt_message_send(DATA, SZ)
+	#define SF(...) clt_message_sendf(i, __VA_VARGS__)
+	#define SN(DATA, SZ) clt_message_send(i, DATA, SZ)
 
 	for(int i = 0; i < MAX_CLIENTS; i++){
 		switch g_clients[i].state{
 			case CLIENT_STATE_EMPTY:
 				continue;
+			case CLIENT_STATE_REGISTER:
+				break;
 			case CLIENT STATE_INIT:
 				SF(":%s 001 %s :Welcome to sBNC, %s", core_host(), state_nick(), state_nick());
 				SF(":%s 002 %s :Your host is %s, running version %s", core_host(), state_nick(), core_host(), core_version());
@@ -105,6 +107,27 @@ int clt_accept()
 
 void clt_message_process(int fd, char *buf)
 {
+	int id = clt_clients_get_id(fd);
+	char *tmp = util_strdup(buf);
+	struct irc_message m = util_irc_message_parse(tmp);
+
+	if(core_passwd() && !strcmp(m.tokarr[m.cmd], "PASS")){
+		g_clients[id].auth = !strcmp(m.tokarr[m.middle], core_passwd());
+		return;
+	}
+	else if(!strcmp(m.tokarr[m.cmd], "NICK"))
+		return;
+	else if(!strcmp(m.tokarr[m.cmd], "USER")){
+		g_clients[id].username = util_strdup(m.tokarr[m.middle]);
+		if(core_passwd() && !g_clients[id].auth){
+			clt_message_sendf(id, ":%s 464 %s :Password incorrect");
+			clt_disconnect(id);
+		}
+		else
+			g_clients[id].state = CLIENT_STATE_INIT;
+		return;
+	}
+
 	srv_send_msg(buf, strlen(buf));
 }
 
