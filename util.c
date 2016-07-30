@@ -13,7 +13,7 @@ char *util_strdup(const char *src)
 	return (char *)util_dup(src, len);
 }
 
-void util_strlncpy(char *dst, const char *src, size_t dstsz)
+void util_strncpy(char *dst, const char *src, size_t dstsz)
 {
 	if(!dstsz)
 		return;
