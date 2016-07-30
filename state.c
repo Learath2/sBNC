@@ -26,12 +26,12 @@ const char *state_server_cmodes() { return g_scmodes; }
 
 void state_server_umodes_set(char *s)
 {
-	strncpy(g_sumodes, s, sizeof g_sumodes);
+	util_strncpy(g_sumodes, s, sizeof g_sumodes);
 }
 
 void state_server_cmodes_set(char *s)
 {
-	strncpy(g_sumodes, s, sizeof g_scmodes);
+	util_strncpy(g_scmodes, s, sizeof g_scmodes);
 }
 
 void state_server_005_store(char *s)

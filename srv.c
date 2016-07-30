@@ -33,9 +33,7 @@ int srv_socket(){ return g_socket; }
 void srv_message_process(char *buf)
 {
 	char *tmp = util_strdup(buf);
-	char *tokarr[MAX_TOKENS] = {0};
-	int ntok = util_tokenize(tmp, tokarr, COUNT_OF(tokarr));
-	struct irc_message m = util_irc_message_parse(tokarr, ntok);
+	struct irc_message m = util_irc_message_parse(tmp);
 	bool me = !strcmp(m.prefix.nick, state_nick());
 
 	if(me && !strcmp(m.tokarr[m.cmd], "JOIN")){
@@ -58,8 +56,9 @@ void srv_message_process(char *buf)
 	else if(me && !strcmp(m.tokarr[m.cmd], "005")){
 		state_server_005_store(buf);
 	}
+	free(tmp);
 
-	clt_send_message(-1, msg, strlen(buf));
+	clt_send_message(-1, buf, strlen(buf));
 }
 
 void srv_message_sendf(const char *format, ... )

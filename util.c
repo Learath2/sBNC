@@ -13,6 +13,17 @@ char *util_strdup(const char *src)
 	return (char *)util_dup(src, len);
 }
 
+void util_strlncpy(char *dst, const char *src, size_t dstsz)
+{
+	if(!dstsz)
+		return;
+
+	while(dstsz--)
+		if(!(*dst++ = *src++))
+			return;
+	dest[-1] = '\0';
+}
+
 int util_tokenize(char *buf, char **tokarr, size_t toksize)
 {	
 	if(buf[0] == ' ') //Cant begin with whitespace
@@ -31,15 +42,14 @@ int util_tokenize(char *buf, char **tokarr, size_t toksize)
 	return ntok;
 }
 
-struct irc_message util_irc_message_parse(char **tokarr, int ntok)
+struct irc_message util_irc_message_parse(char *msg)
 {
 	struct irc_message r;
-	r.tokarr = tokarr;
-	r.ntok = ntok;
-	r.prefix = (tokarr[0][0] == ':') ? util_irc_prefix_parse(tokarr[0]) : {0};
+	r.ntok = util_tokenize(msg, r.tokarr, COUNT_OF(r.tokarr));
+	r.prefix = (r.tokarr[0][0] == ':') ? util_irc_prefix_parse(r.tokarr[0]) : {0};
 	r.cmd = (r.prefix) ? 1 : 0;
 	r.middle = r.cmd + 1;
-	r.trailing = (tokarr[ntok - 1][0] == ':') ? ntok - 1 : -1;
+	r.trailing = (r.tokarr[ntok - 1][0] == ':') ? ntok - 1 : -1;
 
 	return r;
 }
