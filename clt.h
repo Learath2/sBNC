@@ -12,7 +12,7 @@ typedef enum{
 struct client{
 	int fd;
 	client_state_t state;
-	int lastping;
+	time_t lastact;
 	bool auth;
 	char *username;
 };

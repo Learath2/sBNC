@@ -64,7 +64,7 @@ int clt_init(int port)
 	for(int i = 0; i < MAX_CLIENTS; i++){
 		g_clients[i].fd = -1;
 		g_clients[i].state = CLIENT_STATE_EMPTY;
-		g_clients[i].lastping = 0;
+		g_clients[i].lastact = time();
 	}
 	return g_socket;
 }
@@ -91,6 +91,10 @@ void clt_tick()
 				state_channel_client_init(i);
 				g_clients[i].state = CLIENT_STATE_READY;
 				break;
+			case CLIENT_STATE_READY:
+				if(time() - g_clients[i].lastact > 60)
+					SF(":%s PING :%s", core_host(), core_host());
+				break;
 		}
 	}
 
@@ -108,6 +112,9 @@ int clt_accept()
 void clt_message_process(int fd, char *buf)
 {
 	int id = clt_clients_get_id(fd);
+
+	g_clients[id].lastact = time();
+
 	char *tmp = util_strdup(buf);
 	struct irc_message m = util_irc_message_parse(tmp);
 
