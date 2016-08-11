@@ -118,11 +118,13 @@ void clt_message_process(int fd, char *buf)
 
 	g_clients[id].lastact = time();
 
+	struct settings *s = sett_get();
+
 	char *tmp = util_strdup(buf);
 	struct irc_message m = util_irc_message_parse(tmp);
 
 	if(core_passwd() && !strcmp(m.tokarr[m.cmd], "PASS")){
-		g_clients[id].auth = !strcmp(m.tokarr[m.middle], core_passwd());
+		g_clients[id].auth = !strcmp(m.tokarr[m.middle], s->pass);
 		return;
 	}
 	else if(!strcmp(m.tokarr[m.cmd], "NICK"))
