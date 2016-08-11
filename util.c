@@ -87,3 +87,15 @@ struct irc_prefix util_irc_prefix_parse(char *prefix)
 
 	return p;
 }
+
+void util_parse_hostspec(char *host, size_t sz, int *port, char *hostspec)
+{
+	char *sep = strchr(hostspec, ':');
+	if(sep)
+		*sep = '\0';
+	util_strncpy(host, hostspec, sz);
+	if(sep)
+		*port = strtol(sep[1], NULL, 10);
+	else
+		*port = 6667;
+}

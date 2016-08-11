@@ -23,3 +23,4 @@ int util_clamp(int val, int min, int max);
 int util_tokenize(char *buf, char **tokarr, size_t toksize);
 struct irc_message util_irc_message_parse(char *msg);
 struct irc_prefix util_irc_prefix_parse(char *prefix);
+void util_parse_hostspec(char *host, size_t sz, int *port, char *hostspec);

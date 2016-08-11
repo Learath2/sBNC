@@ -90,6 +90,15 @@ void process_args(int *argc, char ***argv)
 		}
 	}
 	#undef CSET
+
+	*argc -= optind;
+	*argv += optind;
+
+	if(!*argc){
+		ERR("No hostspec given.");
+		usage(stderr, a0, EXIT_FAILURE, true);
+	}
+	util_parse_hostspec(&s->server.host, sizeof s->server.host, &s->server.port, (*argv)[0]);
 }
 
 int main(int argc, char **argv)

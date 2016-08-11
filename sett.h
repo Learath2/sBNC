@@ -1,7 +1,7 @@
 struct server{
-	char *host;
+	char host[128];
 	int port;
-	char *pass;
+	char pass[64];
 };
 
 struct settings{
