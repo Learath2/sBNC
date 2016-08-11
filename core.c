@@ -7,6 +7,7 @@
 #include "clt.h"
 #include "proc.h"
 #include "state.h"
+#include "log.h"
 
 #define LISTENER 0
 #define SERVER 1
