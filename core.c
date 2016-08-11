@@ -1,3 +1,5 @@
+#define MODULE_NAME "core"
+
 #include <stdio.h>
 
 #include "core.h"
@@ -9,23 +11,16 @@
 #define LISTENER 0
 #define SERVER 1
 #define POLLTIMEOUT 1 * 60 * 1000
-#define DATESIZE 64
+#define VERSION "0.0.1"
 
-const char g_version[] = "sBNC version -1";
-char g_epoch[DATESIZE];
-
-const char *core_version() { return g_version; }
-const char *core_epoch() { return g_epoch; }
-
-int main(int argc, char **argv)
+int core_run(void)
 {
 	int nfds = 0, s_server = 0, s_listener = 0;
 	struct pollfd fds[MAX_SOCKETS];
-
-	process_args(&argc, &argv);
+	struct settings *s = sett_get();
 	
 	s_server = srv_init();
-	srv_connect("irc.quakenet.org:6667");
+	srv_connect(s->server);
 
 	s_listener = clt_init();
 
@@ -72,4 +67,8 @@ int main(int argc, char **argv)
 			proc_wqueue_next();
 		}
 	}
+	
+	return EXIT_SUCCESS;
 }
+
+#undef MODULE_NAME

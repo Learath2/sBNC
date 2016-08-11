@@ -24,6 +24,15 @@ void util_strncpy(char *dst, const char *src, size_t dstsz)
 	dest[-1] = '\0';
 }
 
+int util_clamp(int val, int min, int max)
+{
+	if(val < min)
+		return min;
+	if(val > max)
+		return max;
+	return val;
+}
+
 int util_tokenize(char *buf, char **tokarr, size_t toksize)
 {	
 	if(buf[0] == ' ') //Cant begin with whitespace

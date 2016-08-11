@@ -1,3 +1,5 @@
+#define MODULE_NAME "state"
+
 #include "state.h"
 
 #define MAX_CHANNELS 20
@@ -79,3 +81,5 @@ void state_channel_client_init(int id)
 		}
 	}
 }
+
+#undef MODULE_NAME

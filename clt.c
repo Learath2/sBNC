@@ -1,3 +1,5 @@
+#define MODULE_NAME "clt"
+
 #include "clt.h"
 #include "core.h"
 
@@ -82,9 +84,9 @@ void clt_tick()
 				break;
 			case CLIENT STATE_INIT:
 				SF(":%s 001 %s :Welcome to sBNC, %s", core_host(), state_nick(), state_nick());
-				SF(":%s 002 %s :Your host is %s, running version %s", core_host(), state_nick(), core_host(), core_version());
+				SF(":%s 002 %s :Your host is %s, running version "VERSION, core_host(), state_nick(), core_host());
 				SF(":%s 003 %s :This server was created %s", core_host(), state_nick(), core_epoch());
-				SF(":%s 004 %s :%s %s %s %s", core_host(), state_nick(), core_host(), core_version(), state_server_umodes(), state_server_cmodes());
+				SF(":%s 004 %s :%s %s sBNC-"VERSION" %s", core_host(), state_nick(), core_host(), state_server_umodes(), state_server_cmodes());
 				state_server_005(i);
 				srv_message_sendf("LUSERS"); //Need to route the replies somehow
 				srv_message_sendf("MOTD");   //ditto
@@ -159,3 +161,5 @@ void clt_message_send(int id, void *data, size_t datasz)
 			if(g_clients[i].fd != -1)
 				proc_wqueue_add(g_clients[i].fd, data, datasz);
 }
+
+#undef MODULE_NAME

@@ -1,4 +1,8 @@
+#define MODULE_NAME "srv"
+
 #include "srv.h"
+#include "sett.h"
+#include "log.h"
 
 int g_socket = 0;
 srv_state_t g_state = SRV_STATE_OFFLINE;
@@ -26,9 +30,11 @@ int srv_connect(char *server)
 	if(connect(g_socket, (struct sockaddr *)&srv_addr, sizeof srv_addr))
 		return -1;
 
-	srv_message_sendf("PASS %s", core_tpasswd());
-	srv_message_sendf("NICK %s", core_nick());
-	srv_message_sendf("USER %s 8 * :%s", core_username(), core_realname());
+	struct settings *s = sett_get();
+
+	srv_message_sendf("PASS %s", s->server.pass);
+	srv_message_sendf("NICK %s", s->nick);
+	srv_message_sendf("USER %s 8 * :%s", s->uname, s->rname);
 
 	return 0;
 }
@@ -70,6 +76,10 @@ void srv_message_process(char *buf)
 		state_server_005_store(buf);
 		return;
 	}
+	else if(me && !strcmp(m.tokarr[m.cmd], "NICK")){
+		state_nick_set(m.tokarr[m.middle]);
+		return;
+	}
 	free(tmp);
 
 	clt_send_message(-1, buf, strlen(buf));
@@ -91,3 +101,5 @@ void srv_message_send(void *data, size_t datasz)
 {
 	proc_wqueue_add(g_socket, data, datasz);
 }
+
+#undef

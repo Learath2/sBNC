@@ -1,3 +1,5 @@
+#define MODULE_NAME "proc"
+
 #include "proc.h"
 #include "clt.h"
 #include "srv.h"
@@ -67,3 +69,5 @@ void proc_read(int fd, char *buf)
 	else
 		clt_process_message(fd, buf);
 }
+
+#undef MODULE_NAME
