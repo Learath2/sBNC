@@ -19,6 +19,9 @@ void sett_init(void)
 	g_sett.nick = "sBNC";
 	g_sett.uname = "sBNC";
 	g_sett.rname = "Simple BNC";
+	g_sett.spath = "";
+	g_sett.sfmt = "%D:%M:%Y_%h#%c";
+	g_sett.sextras = "";
 	g_sett.server = {NULL, 0, NULL, false};
 }
 
@@ -30,6 +33,10 @@ void sett_dump(void)
 	DBG("nickname = %s", g_sett.nick);
 	DBG("username = %s", g_sett.uname);
 	DBG("realname = %s", g_sett.rname);
+	DBG("store:")
+	DBG("\tpath = %s", g_sett.spath);
+	DBG("\tformat = %s", g_sett.sfmt);
+	DBG("\textras = %s", g_sett.sextras);
 	DBG("server:");
 	DBG("\thost = %s", g_sett.server.host);
 	DBG("\tport = %d", g_sett.server.port);

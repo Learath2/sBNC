@@ -6,6 +6,7 @@
 #include "srv.h"
 #include "clt.h"
 #include "proc.h"
+#include "store.h"
 #include "state.h"
 #include "log.h"
 
@@ -19,6 +20,8 @@ int core_run(void)
 	int nfds = 0, s_server = 0, s_listener = 0;
 	struct pollfd fds[MAX_SOCKETS];
 	struct settings *s = sett_get();
+
+	store_init();
 	
 	s_server = srv_init();
 	if(srv_connect(s->server) == -1){

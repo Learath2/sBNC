@@ -11,6 +11,9 @@ struct settings{
 	int hbeat;
 	char qmsg[512];
 	int verb;
+	char spath[256];
+	char sfmt[128];
+	char sextras[64];
 
 	char nick[64];
 	char uname[64];
