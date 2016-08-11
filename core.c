@@ -20,7 +20,10 @@ int core_run(void)
 	struct settings *s = sett_get();
 	
 	s_server = srv_init();
-	srv_connect(s->server);
+	if(srv_connect(s->server) == -1){
+		ERR("srv_connect() failed. Exiting...");
+		return EXIT_FAILURE;
+	}
 
 	s_listener = clt_init();
 
@@ -33,6 +36,7 @@ int core_run(void)
 	while(running){
 		int res = poll(fds, nfds, POLLTIMEOUT);
 		if(res < 0){ //Poll failed
+			ERR("poll() failed. Exiting...");
 			running = false;
 			break;
 		}
@@ -67,7 +71,7 @@ int core_run(void)
 			proc_wqueue_next();
 		}
 	}
-	
+
 	return EXIT_SUCCESS;
 }
 

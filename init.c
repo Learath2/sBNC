@@ -96,8 +96,9 @@ int main(int argc, char **argv)
 {
 	sett_init();
 	process_args(&argc, &argv);
+	ALL("Running sBNC-"VERSION);
 	sett_dump();
-	
+
 	exit(core_run());
 }
 

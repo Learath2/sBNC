@@ -114,6 +114,7 @@ int clt_accept()
 void clt_message_process(int fd, char *buf)
 {
 	int id = clt_clients_get_id(fd);
+	INF("{%d}%s", id, buf);
 
 	g_clients[id].lastact = time();
 
