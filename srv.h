@@ -5,7 +5,7 @@ typedef enum {
 } srv_state_t;
 
 int srv_init(void);
-int srv_connect(char *server);
+int srv_connect(void);
 srv_state_t srv_state(void);
 int srv_socket(void);
 void srv_message_process(char *buf);

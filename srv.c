@@ -18,19 +18,20 @@ int srv_init()
 	return g_socket;
 }
 
-int srv_connect(char *server)
+int srv_connect()
 {
-	//TODO: turn host:port into int port, char *host
+	struct settings *s = sett_get();
 	struct sockaddr_in srv_addr;
 
 	memset(srv_addr, 0, sizeof srv_addr);
 	srv_addr.sin_family		= AF_INET;
-	srv_addr.sin_port		= htons(port);
+	srv_addr.sin_port		= htons(s->server.port);
+	getaddrinfo();//TODO:Finish this up
 	inet_pton(AF_INET, host, &srv_addr.sin_addr);
 	if(connect(g_socket, (struct sockaddr *)&srv_addr, sizeof srv_addr))
 		return -1;
 
-	struct settings *s = sett_get();
+	
 
 	srv_message_sendf("PASS %s", s->server.pass);
 	srv_message_sendf("NICK %s", s->nick);
