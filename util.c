@@ -88,8 +88,10 @@ struct irc_prefix util_irc_prefix_parse(char *prefix)
 	return p;
 }
 
-void util_parse_hostspec(char *host, size_t sz, int *port, char *hostspec)
+void util_parse_hostspec(char *host, size_t sz, int *port, bool *ssl, char *hostspec)
 {
+	if(hostspec[0] == '!')
+		*ssl = true;
 	char *sep = strchr(hostspec, ':');
 	if(sep)
 		*sep = '\0';

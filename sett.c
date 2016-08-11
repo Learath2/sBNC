@@ -19,7 +19,7 @@ void sett_init(void)
 	g_sett.nick = "sBNC";
 	g_sett.uname = "sBNC";
 	g_sett.rname = "Simple BNC";
-	g_sett.server = {NULL, 0, NULL};
+	g_sett.server = {NULL, 0, NULL, false};
 }
 
 void sett_dump(void)
@@ -34,6 +34,7 @@ void sett_dump(void)
 	DBG("\thost = %s", g_sett.server.host);
 	DBG("\tport = %d", g_sett.server.port);
 	DBG("\tpass = %s", g_sett.server.pass);
+	DBG("\tssl = %s", g_sett.server.ssl ? "true", "false");
 }
 
 #undef MODULE_NAME

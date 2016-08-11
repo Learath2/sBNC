@@ -2,6 +2,7 @@ struct server{
 	char host[128];
 	int port;
 	char pass[64];
+	bool ssl;
 };
 
 struct settings{

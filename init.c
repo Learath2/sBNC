@@ -28,6 +28,7 @@ void usage(FILE *f, const char *a0, int ec, bool sh)
 		O("\t-R <str>: Use <str> as realname.");
 		O("\t-P <str>: Use <str> as server password.");
 		O("\t-Q <str>: Use <str> as quit message.");
+		O("\t<hostspec>: In [!]<host:port> format. ! denotes ssl.");
 	}
 
 	#undef O
@@ -98,7 +99,7 @@ void process_args(int *argc, char ***argv)
 		ERR("No hostspec given.");
 		usage(stderr, a0, EXIT_FAILURE, true);
 	}
-	util_parse_hostspec(&s->server.host, sizeof s->server.host, &s->server.port, (*argv)[0]);
+	util_parse_hostspec(&s->server.host, sizeof s->server.host, &s->server.port, &s->server.ssl, (*argv)[0]);
 }
 
 int main(int argc, char **argv)
