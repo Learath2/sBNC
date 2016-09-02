@@ -1,6 +1,8 @@
 #ifndef SETT_H_
 #define SETT_H_
 
+#include <time.h>
+
 struct server{
 	char host[128];
 	int port;

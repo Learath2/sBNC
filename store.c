@@ -1,5 +1,7 @@
 #define MODULE_NAME "store"
 
+#include <time.h>
+
 #include "util.h"
 #include "store.h"
 #include "state.h"

@@ -8,6 +8,8 @@
 #define XSTR(s) STR(s)
 #define STR(s) #s
 
+#define MAX_TOKENS 20
+
 struct irc_prefix{
 	char *nick;
 	char *user;
