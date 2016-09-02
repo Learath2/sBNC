@@ -8,7 +8,7 @@ typedef struct wqueue_entry *wqueue_entry_t;
 void proc_wqueue_add(int target, void *data, size_t datasz);
 void proc_wqueue_next();
 size_t proc_wqueue_length();
-wqueue_entry_t *proc_wqueue_head();
+wqueue_entry_t proc_wqueue_head();
 int proc_wqueue_entry_target(wqueue_entry_t d);
 void *proc_wqueue_entry_data(wqueue_entry_t d);
 size_t proc_wqueue_entry_datasz(wqueue_entry_t d);

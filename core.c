@@ -78,7 +78,7 @@ int core_run(void)
 		proc_tick();
 
 		while(proc_wqueue_length()){
-			wqueue_entry_t *ent = proc_wqueue_head();
+			wqueue_entry_t ent = proc_wqueue_head();
 			write(ENT_GET(ent, target), ENT_GET(ent, data), ENT_GET(ent, datasz));
 			proc_wqueue_next();
 		}
