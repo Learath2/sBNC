@@ -23,7 +23,7 @@ int clt_clients_get_id(int fd);
 int clt_clients_add(int fd);
 void clt_clients_remove_id(int id);
 void clt_clients_remove_fd(int fd);
-int clt_init(int port);
+int clt_init();
 void clt_tick(void);
 int clt_accept(void);
 void clt_message_process(int fd, char *buf);

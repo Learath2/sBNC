@@ -15,7 +15,7 @@ void usage(FILE *f, const char *a0, int ec, bool sh)
 	#define F(STR, ...) fprintf(f, STR "\n", __VA_ARGS__)
 
 		O("sBNC-"VERSION"- simple irc bouncer");
-		F("usage: %s [-hHVirfjvlLtpNURPQ] <hostspec>", a0);
+		F("usage: %s [-hHVirfjvlLtTpNURPQ] <hostspec>", a0);
 	if(!sh){
 		O("\t-h: Display usage statement.");
 		O("\t-H: Display this statement.");
@@ -28,6 +28,7 @@ void usage(FILE *f, const char *a0, int ec, bool sh)
 		O("\t-l <str>: Set the of the logfile to <str>.");
 		O("\t-L <int>: Set logfile verbosity to <int>. (0:silent,1:error,2:warn,3:info.4:debug)");
 		O("\t-t <int>: Send heartbeat pings every <int> seconds.");
+		O("\t-T <int>: Bouncer port.");
 		O("\t-p <str>: Use <str> as bouncer password.");
 		O("\t-N <str>: Use <str> as nick.");
 		O("\t-U <str>: Use <str> as username.");
@@ -50,7 +51,7 @@ void process_args(int *argc, char ***argv)
 	#define CSET(STR) util_strncpy(STR, optarg, sizeof STR)
 
 	int c;
-	while((c = getopt(*argc, *argv, "hHVi:r:f:jv:l:L:t:p:N:U:R:P:Q:")) != -1){
+	while((c = getopt(*argc, *argv, "hHVi:r:f:jv:l:L:t:T:p:N:U:R:P:Q:")) != -1){
 		switch(c){
 			case 'h':
 				usage(stdout, a0, EXIT_SUCCESS, true);
@@ -84,6 +85,9 @@ void process_args(int *argc, char ***argv)
 				break;
 			case 't':
 				s->hbeat = strtol(optarg, NULL, 10);
+				break;
+			case 'T':
+				s->port = strtol(optarg, NULL, 10);
 				break;
 			case 'p':
 				CSET(s->pass);

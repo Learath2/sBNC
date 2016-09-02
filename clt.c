@@ -59,8 +59,10 @@ void clt_clients_remove_fd(int fd)
 }
 
 //TODO: Check for errors :P
-int clt_init(int port)
+int clt_init()
 {
+	struct settings *s = sett_get();
+
 	struct sockaddr_in clt_addr;
 	int re = 1, rc = 0;
 
@@ -71,7 +73,7 @@ int clt_init(int port)
 	memset(&clt_addr, 0, sizeof clt_addr);
 	clt_addr.sin_family			= AF_INET;
 	clt_addr.sin_addr.s_addr	= htonl(INADDR_ANY);
-	clt_addr.sin_port			= htons(port);
+	clt_addr.sin_port			= htons(s->port);
 
 	bind(g_socket, (struct sockaddr *)&clt_addr, sizeof clt_addr);
 

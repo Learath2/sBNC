@@ -21,6 +21,7 @@ void sett_init(void)
 	g_sett.uname = "sBNC";
 	g_sett.rname = "Simple BNC";
 	g_sett.host = "localhost";
+	g_sett.port = 6667;
 	g_sett.spath = "";
 	g_sett.sfmt = "%D:%M:%Y_%h#%c";
 	g_sett.sjoin = false;
@@ -36,6 +37,7 @@ void sett_dump(void)
 	DBG("username = %s", g_sett.uname);
 	DBG("realname = %s", g_sett.rname);
 	DBG("host = %s", g_sett.host);
+	DBG("port = %s", g_sett.port);
 	DBG("store:")
 	DBG("\tpath = %s", g_sett.spath);
 	DBG("\tformat = %s", g_sett.sfmt);

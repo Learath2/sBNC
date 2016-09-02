@@ -21,6 +21,7 @@ struct settings{
 	char sfmt[128];
 	bool sjoin;
 	char host[64];
+	int port;
 
 	char nick[64];
 	char uname[64];
