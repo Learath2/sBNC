@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <poll.h>
+#include <sys/socket.h>
+#include <unistd.h>
 
 #include "util.h"
 #include "core.h"
@@ -22,6 +24,8 @@
 int core_run(void)
 {
 	int nfds = 0, s_server = 0, s_listener = 0;
+	bool running = true;
+
 	struct pollfd fds[MAX_SOCKETS];
 	struct settings *s = sett_get();
 
