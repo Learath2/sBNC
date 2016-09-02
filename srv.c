@@ -32,22 +32,20 @@ int srv_init()
 	return g_socket;
 }
 
-int srv_connect()
+int srv_connect(struct server *srv)
 {
 	struct settings *s = sett_get();
 	struct sockaddr_in srv_addr;
 
 	memset(&srv_addr, 0, sizeof srv_addr);
 	srv_addr.sin_family		= AF_INET;
-	srv_addr.sin_port		= htons(s->server.port);
+	srv_addr.sin_port		= htons(s->port);
 	getaddrinfo();//TODO:Finish this up
-	inet_pton(AF_INET, s->host, &srv_addr.sin_addr);
+	inet_pton(AF_INET, srv->host, &srv_addr.sin_addr);
 	if(connect(g_socket, (struct sockaddr *)&srv_addr, sizeof srv_addr))
 		return -1;
 
-	
-
-	srv_message_sendf("PASS %s", s->server.pass);
+	srv_message_sendf("PASS %s", srv->pass);
 	srv_message_sendf("NICK %s", s->nick);
 	srv_message_sendf("USER %s 8 * :%s", s->uname, s->rname);
 

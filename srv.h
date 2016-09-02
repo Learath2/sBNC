@@ -1,6 +1,8 @@
 #ifndef SRV_H_
 #define SRV_H_
 
+#include "sett.h"
+
 typedef enum {
 	SRV_STATE_OFFLINE = -1,
 	SRV_STATE_CONNECTED,
@@ -8,7 +10,7 @@ typedef enum {
 } srv_state_t;
 
 int srv_init(void);
-int srv_connect(void);
+int srv_connect(struct server *srv);
 srv_state_t srv_state(void);
 int srv_socket(void);
 void srv_message_process(char *buf);
