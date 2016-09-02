@@ -1,9 +1,9 @@
 #define MODULE_NAME "proc"
 
+#include "util.h"
 #include "proc.h"
 #include "clt.h"
 #include "srv.h"
-#include "util.h"
 
 struct wqueue_entry
 {

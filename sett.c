@@ -1,5 +1,6 @@
 #define MODULE_NAME "sett"
 
+#include "util.h"
 #include "sett.h"
 #include "log.h"
 

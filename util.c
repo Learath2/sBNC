@@ -1,3 +1,5 @@
+#include "util.h"
+
 void *util_dup(const void *src, size_t len)
 {
     void *new = malloc(len);

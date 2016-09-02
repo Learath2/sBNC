@@ -2,8 +2,8 @@
 
 #include <stdio.h>
 
-#include "core.h"
 #include "util.h"
+#include "core.h"
 #include "sett.h"
 #include "log.h"
 

@@ -1,9 +1,9 @@
 #define MODULE_NAME "store"
 
+#include "util.h"
 #include "store.h"
 #include "state.h"
 #include "sett.h"
-#include "util.h"
 #include "log.h"
 
 void store_init()

@@ -1,7 +1,7 @@
 #define MODULE_NAME "state"
 
-#include "state.h"
 #include "util.h"
+#include "state.h"
 
 #define MAX_CHANNELS 20
 #define INITIAL_BUFFER_SIZE 10

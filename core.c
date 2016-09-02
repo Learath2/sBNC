@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 
+#include "util.h"
 #include "core.h"
 #include "srv.h"
 #include "clt.h"

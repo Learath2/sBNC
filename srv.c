@@ -1,5 +1,6 @@
 #define MODULE_NAME "srv"
 
+#include "util.h"
 #include "srv.h"
 #include "sett.h"
 #include "log.h"

@@ -1,5 +1,6 @@
 #define MODULE_NAME "clt"
 
+#include "util.h"
 #include "clt.h"
 #include "store.h"
 #include "core.h"
