@@ -1,6 +1,9 @@
 #define MODULE_NAME "store"
 
 #include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "util.h"
 #include "store.h"
@@ -26,7 +29,7 @@ void store_msg(char *msg)
 		store_format_parse(path, sizeof path, s->sfmt, m.tokarr[m.middle]);
 		mkdir_r(path);
 
-		util_prefix_construct(buf, sizeof buf, m.prefix);
+		util_irc_prefix_construct(buf, sizeof buf, m.prefix);
 		strcat(buf, ": ");
 		strcat(buf, m.tokarr[m.trailing] + 1);
 		store_store(path, buf);
