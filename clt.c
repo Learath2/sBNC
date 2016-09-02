@@ -10,6 +10,7 @@
 #include "clt.h"
 #include "sett.h"
 #include "srv.h"
+#include "proc.h"
 #include "state.h"
 #include "store.h"
 #include "log.h"
@@ -89,7 +90,7 @@ void clt_tick()
 	#define SN(DATA, SZ) clt_message_send(i, DATA, SZ)
 
 	struct settings *s = sett_get();
-	
+
 	for(int i = 0; i < MAX_CLIENTS; i++){
 		switch (g_clients[i].state) {
 			case CLIENT_STATE_EMPTY:
@@ -99,7 +100,7 @@ void clt_tick()
 			case CLIENT_STATE_INIT:
 				SF(":%s 001 %s :Welcome to sBNC, %s", s->host, state_nick(), state_nick());
 				SF(":%s 002 %s :Your host is %s, running version "VERSION, s->host, state_nick(), s->host);
-				SF(":%s 003 %s :This server was created %s", s->host, state_nick(), core_epoch());
+				SF(":%s 003 %s :This server was created %s", s->host, state_nick(), s->epoch);
 				SF(":%s 004 %s :%s %s sBNC-"VERSION" %s", s->host, state_nick(), s->host, state_server_umodes(), state_server_cmodes());
 				state_server_005(i);
 				srv_message_sendf("LUSERS"); //Need to route the replies somehow
