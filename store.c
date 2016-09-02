@@ -14,14 +14,14 @@
 void store_init()
 {
 	struct settings *s = sett_get();
-	mkdir_r(s->spath);
+	//mkdir_r(s->spath); //Will implement in platform.c
 }
 
 void store_msg(char *msg)
 {
 	struct settings *s = sett_get();
 	char *t = util_strdup(msg);
-	struct irc_message m = util_irc_message_parse(tmp);
+	struct irc_message m = util_irc_message_parse(t);
 
 	if(!strcmp(m.tokarr[m.cmd], "PRIVMSG")){
 		char path[1024], buf[1024];
@@ -40,7 +40,7 @@ void store_msg(char *msg)
 		store_format_parse(path, sizeof path, s->sfmt, m.tokarr[m.middle]);
 		mkdir_r(path);
 
-		util_prefix_construct(buf, sizeof buf, m.prefix);
+		util_irc_prefix_construct(buf, sizeof buf, m.prefix);
 		strcat(buf, " ");
 		strcat(buf, (m.tokarr[m.cmd][1] == 'J') ? "joined." : "left.");
 		store_store(path, buf);
@@ -56,12 +56,12 @@ bool store_store(char *path, char *msg)
 {
 	char buf[2048];
 	time_t t = time(NULL);
-	struct tm tm = localtime(t);
+	struct tm tm = localtime(&t);
 
 	strftime(buf, sizeof buf, "%T ", tm);
 	strcat(buf, msg);
 
-	FILE *f = fopen(patn, "a");
+	FILE *f = fopen(path, "a");
 	if(!f)
 		return false;
 
@@ -127,7 +127,7 @@ bool store_format_parse(char *buf, size_t bufsz, const char *fmt, const char *ch
 
 fuckthisshit:
 	time_t t = time(NULL);
-	struct tm tm = localtime(t);
+	struct tm tm = localtime(&t);
 	strftime(buf, bufsz, temp, tm);
 	free(temp);
 	return true;
