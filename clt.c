@@ -1,7 +1,10 @@
 #define MODULE_NAME "clt"
 
+#include <sys/socket.h>
+
 #include "util.h"
 #include "clt.h"
+#include "state.h"
 #include "store.h"
 #include "core.h"
 

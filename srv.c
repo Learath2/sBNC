@@ -1,5 +1,7 @@
 #define MODULE_NAME "srv"
 
+#include <sys/socket.h>
+
 #include "util.h"
 #include "srv.h"
 #include "sett.h"
