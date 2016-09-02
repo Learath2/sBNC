@@ -1,6 +1,10 @@
 #define MODULE_NAME "srv"
 
 #include <sys/socket.h>
+#include <sys/ioctl.h>
+#include <arpa/inet.h>
+#include <string.h>
+#include <stdarg.h>
 
 #include "util.h"
 #include "srv.h"

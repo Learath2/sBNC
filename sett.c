@@ -10,7 +10,7 @@ struct settings *sett_get(void) { return &g_sett; }
 
 void sett_init(void)
 {
-	g_sett.rawepoch = time();
+	g_sett.rawepoch = time(NULL);
 	struct tm *tm = localtime(&g_sett.rawepoch);
 	strftime(g_sett.epoch, 64, "%a %b %d %Y at %H:%M:%S", tm);
 

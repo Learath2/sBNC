@@ -16,7 +16,7 @@ struct irc_prefix{
 	char *host;
 };
 
-struct irc_msg{
+struct irc_message{
 	char *tokarr[MAX_TOKENS];
 	int ntok;
 

@@ -1,12 +1,18 @@
 #define MODULE_NAME "clt"
 
 #include <sys/socket.h>
+#include <sys/ioctl.h>
+#include <arpa/inet.h>
+#include <string.h>
+#include <stdarg.h>
 
 #include "util.h"
 #include "clt.h"
+#include "sett.h"
+#include "srv.h"
 #include "state.h"
 #include "store.h"
-#include "core.h"
+#include "log.h"
 
 #define BACKLOG 10
 #define MAX_CLIENTS 10
@@ -41,6 +47,8 @@ void clt_clients_remove_id(int id)
 	g_clients[id].state = CLIENT_STATE_EMPTY;
 	if(g_nclients-- == 1)
 		state_mark_away();
+
+	shutdown(g_clients[id].fd, 2);
 }
 
 void clt_clients_remove_fd(int fd)
@@ -70,7 +78,7 @@ int clt_init(int port)
 	for(int i = 0; i < MAX_CLIENTS; i++){
 		g_clients[i].fd = -1;
 		g_clients[i].state = CLIENT_STATE_EMPTY;
-		g_clients[i].lastact = time();
+		g_clients[i].lastact = time(NULL);
 	}
 	return g_socket;
 }
@@ -98,7 +106,7 @@ void clt_tick()
 				g_clients[i].state = CLIENT_STATE_READY;
 				break;
 			case CLIENT_STATE_READY:
-				if(time() - g_clients[i].lastact > 60)
+				if(time(NULL) - g_clients[i].lastact > 60)
 					SF(":%s PING :%s", core_host(), core_host());
 				if(g_clients[i].needs_playback){
 					state_buffer_play(i);
@@ -124,14 +132,14 @@ void clt_message_process(int fd, char *buf)
 	int id = clt_clients_get_id(fd);
 	INF("{%d}%s", id, buf);
 
-	g_clients[id].lastact = time();
+	g_clients[id].lastact = time(NULL);
 
 	struct settings *s = sett_get();
 
 	char *tmp = util_strdup(buf);
 	struct irc_message m = util_irc_message_parse(tmp);
 
-	if(core_passwd() && !strcmp(m.tokarr[m.cmd], "PASS")){
+	if(s->pass && !strcmp(m.tokarr[m.cmd], "PASS")){
 		g_clients[id].auth = !strcmp(m.tokarr[m.middle], s->pass);
 		return;
 	}
@@ -139,9 +147,9 @@ void clt_message_process(int fd, char *buf)
 		return;
 	else if(!strcmp(m.tokarr[m.cmd], "USER")){
 		g_clients[id].username = util_strdup(m.tokarr[m.middle]);
-		if(core_passwd() && !g_clients[id].auth){
+		if(s->pass && !g_clients[id].auth){
 			clt_message_sendf(id, ":%s 464 %s :Password incorrect");
-			clt_disconnect(id);
+			clt_clients_remove_id(id);
 		}
 		else
 			g_clients[id].state = CLIENT_STATE_INIT;
@@ -171,6 +179,11 @@ void clt_message_send(int id, void *data, size_t datasz)
 		for(int i = 0; i < MAX_CLIENTS; i++)
 			if(g_clients[i].fd != -1)
 				proc_wqueue_add(g_clients[i].fd, data, datasz);
+}
+
+void clt_disconnect(int id)
+{
+
 }
 
 #undef MODULE_NAME

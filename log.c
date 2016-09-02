@@ -1,4 +1,5 @@
 #include <time.h>
+#include <stdarg.h>
 
 #include "log.h"
 
@@ -60,13 +61,13 @@ void log_log(int lvl, const char *fmt, ...)
 
 	char result[2048];
 	if(g_prettytime){
-		time_t t = time();
+		time_t t = time(NULL);
 		struct tm *tm = localtime(&t);
 		strftime(result, sizeof result, "[%d/%m/%y %H:%M:%S]", tm);
 		strcat(result, data);
 	}
 	else
-		sprintf(result, "[%ld]%s\n", time(), data);
+		sprintf(result, "[%ld]%s\n", time(NULL), data);
 
 	if(lvl < g_cverb){
 		FILE *str = (lvl < LOGGER_INFO) ? stderr : stdout;

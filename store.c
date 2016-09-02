@@ -52,7 +52,7 @@ void store_msg(char *msg)
 bool store_store(char *path, char *msg)
 {
 	char buf[2048];
-	time_t t = time();
+	time_t t = time(NULL);
 	struct tm tm = localtime(t);
 
 	strftime(buf, sizeof buf, "%T ", tm);
@@ -123,7 +123,7 @@ bool store_format_parse(char *buf, size_t bufsz, const char *fmt, const char *ch
 		return false;
 
 fuckthisshit:
-	time_t t = time();
+	time_t t = time(NULL);
 	struct tm tm = localtime(t);
 	strftime(buf, bufsz, temp, tm);
 	free(temp);
