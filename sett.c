@@ -10,22 +10,26 @@ struct settings *sett_get(void) { return &g_sett; }
 
 void sett_init(void)
 {
+	#define SSET(S, STR) util_strncpy(S, STR, sizeof S)
+
 	g_sett.rawepoch = time(NULL);
 	struct tm *tm = localtime(&g_sett.rawepoch);
 	strftime(g_sett.epoch, 64, "%a %b %d %Y at %H:%M:%S", tm);
 
-	g_sett.pass = "";
+	SSET(g_sett.pass, "");
 	g_sett.hbeat = 60 * 3;
-	g_sett.qmsg = "sBNC-"VERSION": Leaving";
-	g_sett.nick = "sBNC";
-	g_sett.uname = "sBNC";
-	g_sett.rname = "Simple BNC";
-	g_sett.host = "localhost";
+	SSET(g_sett.qmsg , "sBNC-"VERSION": Leaving");
+	SSET(g_sett.nick , "sBNC");
+	SSET(g_sett.uname , "sBNC");
+	SSET(g_sett.rname , "Simple BNC");
+	SSET(g_sett.host , "localhost");
 	g_sett.port = 6667;
-	g_sett.spath = "";
-	g_sett.sfmt = "%D:%M:%Y_%h#%c";
+	SSET(g_sett.spath , "");
+	SSET(g_sett.sfmt , "%D:%M:%Y_%h#%c");
 	g_sett.sjoin = false;
 	g_sett.server = {NULL, 0, NULL, false};
+
+	#undef SSET
 }
 
 void sett_dump(void)
