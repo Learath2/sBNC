@@ -187,9 +187,4 @@ void clt_message_send(int id, void *data, size_t datasz)
 				proc_wqueue_add(g_clients[i].fd, data, datasz);
 }
 
-void clt_disconnect(int id)
-{
-
-}
-
 #undef MODULE_NAME
