@@ -1,7 +1,15 @@
 #define MODULE_NAME "state"
 
+#include <stdlib.h>
+#include <string.h>
+
+
 #include "util.h"
+#include "sett.h"
+#include "clt.h"
+#include "srv.h"
 #include "state.h"
+#include "log.h"
 
 #define MAX_CHANNELS 20
 #define INITIAL_BUFFER_SIZE 10
@@ -12,7 +20,7 @@ struct channel {
 	char name[200];
 	char *buffer;
 	size_t buffer_cur;
-}
+};
 
 char g_sumodes[32];
 char g_scmodes[32];
@@ -20,6 +28,7 @@ char g_005[MAX_005LINES][513];
 int g_n005 = 0;
 
 char g_nick[10];
+char g_user[32];
 bool g_away = false;
 
 struct channel g_channels[MAX_CHANNELS] = {{"", NULL}};
@@ -60,7 +69,7 @@ void state_server_005_store(char *s)
 void state_server_005(int id)
 {
 	for(int i = 0; i < g_n005; i++)
-		clt_message_send(g_005[i], strlen(g_005[i]));
+		clt_message_send(id, g_005[i], strlen(g_005[i]));
 }
 
 void state_channel_join(char *chan)
@@ -113,7 +122,7 @@ void state_unmark_away()
 
 void state_buffer(char *channel, char* msg)
 {
-	struct channel *c = g_channels[state_channel_id_get(channel)];
+	struct channel *c = &g_channels[state_channel_id_get(channel)];
 
 	if(!c->buffer){
 		c->buffer = malloc(sizeof *g_channels[0].buffer * 513 * INITIAL_BUFFER_SIZE);
@@ -135,15 +144,15 @@ void state_buffer(char *channel, char* msg)
 	else
 		c->buffer = tmp;
 
-	util_strncpy(c->buffer[c->buffer_cur++], msg, 513);
+	util_strncpy(&c->buffer[c->buffer_cur++], msg, 513);
 }
 
 void state_buffer_play(int clid)
 {
 	for(int i = 0; i < MAX_CHANNELS; i++){
-		struct channel *c = g_channels[i];
+		struct channel *c = &g_channels[i];
 		for(int j = 0; j < c->buffer_cur; j++)
-			clt_message_send(clid, c->buffer[j], strlen(c->buffer[j]));
+			clt_message_send(clid, &c->buffer[j], strlen(&c->buffer[j]));
 	}
 }
 
