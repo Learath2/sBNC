@@ -11,12 +11,10 @@
 #include "sett.h"
 #include "log.h"
 
-void mkdir_r(char *p); //Will implement in platform.c
-
 void store_init()
 {
 	struct settings *s = sett_get();
-	mkdir_r(s->spath);
+	mkdir_r(s->spath); //TODO: Implement this in platform.c
 }
 
 void store_msg(char *msg)

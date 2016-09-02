@@ -22,14 +22,14 @@ struct channel {
 	size_t buffer_cur;
 };
 
-char g_sumodes[32];
-char g_scmodes[32];
-char g_005[MAX_005LINES][513];
-int g_n005 = 0;
+static char g_sumodes[32];
+static char g_scmodes[32];
+static char g_005[MAX_005LINES][513];
+static int g_n005 = 0;
 
-char g_nick[10];
-char g_user[32];
-bool g_away = false;
+static char g_nick[10];
+static char g_user[32];
+static bool g_away = false;
 
 struct channel g_channels[MAX_CHANNELS] = {{"", NULL}};
 int g_nchannels = 0;

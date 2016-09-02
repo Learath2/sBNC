@@ -24,7 +24,7 @@ struct wqueue
 
 static void *proc_util_dup(const void *src, size_t len);
 
-struct wqueue g_wqueue = {0};
+static struct wqueue g_wqueue = {0};
 
 void proc_wqueue_add(int target, void *data, size_t datasz)
 {

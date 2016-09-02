@@ -4,7 +4,7 @@
 #include "sett.h"
 #include "log.h"
 
-struct settings g_sett;
+static struct settings g_sett;
 
 struct settings *sett_get(void) { return &g_sett; }
 

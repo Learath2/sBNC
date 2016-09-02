@@ -18,8 +18,8 @@
 #include "sett.h"
 #include "log.h"
 
-int g_socket = 0;
-srv_state_t g_state = SRV_STATE_OFFLINE;
+static int g_socket = 0;
+static srv_state_t g_state = SRV_STATE_OFFLINE;
 
 int srv_init()
 {

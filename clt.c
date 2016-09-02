@@ -19,9 +19,9 @@
 #define BACKLOG 10
 #define MAX_CLIENTS 10
 
-int g_socket = -1;
-int g_nclients = 0;
-struct client g_clients[MAX_CLIENTS];
+static int g_socket = -1;
+static int g_nclients = 0;
+static struct client g_clients[MAX_CLIENTS];
 
 int clt_clients_get_id(int fd)
 {
