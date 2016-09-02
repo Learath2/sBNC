@@ -6,6 +6,7 @@ struct server{
 };
 
 struct settings{
+	time_t rawepoch;
 	char epoch[64];
 	char pass[64];
 	int hbeat;
@@ -13,7 +14,7 @@ struct settings{
 	int verb;
 	char spath[256];
 	char sfmt[128];
-	char sextras[64];
+	bool sjoin;
 
 	char nick[64];
 	char uname[64];

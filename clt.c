@@ -1,6 +1,7 @@
 #define MODULE_NAME "clt"
 
 #include "clt.h"
+#include "store.h"
 #include "core.h"
 
 #define BACKLOG 10
@@ -26,7 +27,7 @@ int clt_clients_add(int fd)
 		if(g_clients[i].fd == -1){
 			g_clients[i].fd = fd;
 			g_clients[i].state = CLIENT_STATE_INIT;
-			g_nclients++;
+			g_clients[i].needs_playback = (g_nclients++ == 0);
 			break;
 		}
 	}
@@ -37,6 +38,8 @@ void clt_clients_remove_id(int id)
 {
 	g_clients[id].fd = -1;
 	g_clients[id].state = CLIENT_STATE_EMPTY;
+	if(g_nclients-- == 1)
+		state_mark_away();
 }
 
 void clt_clients_remove_fd(int fd)
@@ -96,6 +99,10 @@ void clt_tick()
 			case CLIENT_STATE_READY:
 				if(time() - g_clients[i].lastact > 60)
 					SF(":%s PING :%s", core_host(), core_host());
+				if(g_clients[i].needs_playback){
+					state_buffer_play(i);
+					g_clients[i].needs_playback = false;
+				}
 				break;
 		}
 	}

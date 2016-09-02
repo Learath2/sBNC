@@ -9,8 +9,8 @@ struct settings *sett_get(void) { return &g_sett; }
 
 void sett_init(void)
 {
-	time_t t = time();
-	struct tm *tm = localtime(&t);
+	g_sett.rawepoch = time();
+	struct tm *tm = localtime(&g_sett.rawepoch);
 	strftime(g_sett.epoch, 64, "%a %b %d %Y at %H:%M:%S", tm);
 
 	g_sett.pass = "";
@@ -36,7 +36,7 @@ void sett_dump(void)
 	DBG("store:")
 	DBG("\tpath = %s", g_sett.spath);
 	DBG("\tformat = %s", g_sett.sfmt);
-	DBG("\textras = %s", g_sett.sextras);
+	DBG("\tjoin = %s", g_sett.sjoin ? "true", "false");
 	DBG("server:");
 	DBG("\thost = %s", g_sett.server.host);
 	DBG("\tport = %d", g_sett.server.port);

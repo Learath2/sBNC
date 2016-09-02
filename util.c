@@ -21,7 +21,7 @@ void util_strncpy(char *dst, const char *src, size_t dstsz)
 	while(dstsz--)
 		if(!(*dst++ = *src++))
 			return;
-	dest[-1] = '\0';
+	dst[-1] = '\0';
 }
 
 int util_clamp(int val, int min, int max)
@@ -86,6 +86,11 @@ struct irc_prefix util_irc_prefix_parse(char *prefix)
 	p.nick = prefix;
 
 	return p;
+}
+
+void util_irc_prefix_construct(char *buf, size_t bufsz, struct irc_prefix p)
+{
+	snprintf(buf, bufsz, "%s!%s@%s", p.nick, p.user, p.host);
 }
 
 void util_parse_hostspec(char *host, size_t sz, int *port, bool *ssl, char *hostspec)

@@ -15,6 +15,7 @@ struct client{
 	time_t lastact;
 	bool auth;
 	char *username;
+	bool needs_playback;
 };
 
 int clt_clients_get_id(int fd);

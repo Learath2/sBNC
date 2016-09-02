@@ -13,14 +13,14 @@ void usage(FILE *f, const char *a0, int ec, bool sh)
 	#define F(STR, ...) fprintf(f, STR "\n", __VA_ARGS__)
 
 		O("sBNC-"VERSION"- simple irc bouncer");
-		F("usage: %s [-hHVrfsvlLtpNURPQ] <hostspec>", a0);
+		F("usage: %s [-hHVrfjvlLtpNURPQ] <hostspec>", a0);
 	if(!sh){
 		O("\t-h: Display usage statement.");
 		O("\t-H: Display this statement.");
 		O("\t-V: Display version.");
 		O("\t-r <str>: Set store log path.");
 		O("\t-f <str>: Set store filename format. (%E(poch) %D(ay)/%M(onth)/%Y(ear) %h(ost)#%c(han))");
-		O("\t-s <str>: Set store extra list. (Comma seperated list of special messages to log in store)");
+		O("\t-j: Log join and part messages.");
 		O("\t-v <int>: Set console verbosity to <int>. (0:silent,1:error,2:warn,3:info.4:debug)");
 		O("\t-l <str>: Set the of the logfile to <str>.");
 		O("\t-L <int>: Set logfile verbosity to <int>. (0:silent,1:error,2:warn,3:info.4:debug)");
@@ -47,7 +47,7 @@ void process_args(int *argc, char ***argv)
 	#define CSET(STR) util_strncpy(STR, optarg, sizeof STR)
 
 	int c;
-	while((c = getopt(*argc, *argv, "hHVr:f:s:v:l:L:t:p:N:U:R:P:Q:")) != -1){
+	while((c = getopt(*argc, *argv, "hHVr:f:jv:l:L:t:p:N:U:R:P:Q:")) != -1){
 		switch(c){
 			case 'h':
 				usage(stdout, a0, EXIT_SUCCESS, true);
@@ -64,8 +64,8 @@ void process_args(int *argc, char ***argv)
 			case 'f':
 				CSET(s->sfmt);
 				break
-			case 's':
-				CSET(s->sextras);
+			case 'j':
+				s->sjoin = true;
 				break;
 			case 'v':
 				log_cverb_set(util_clamp(strtol(optarg, NULL, 10), LOGGER_SILENT, LOGGER_DEBUG));
