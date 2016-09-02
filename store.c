@@ -106,7 +106,7 @@ bool store_format_parse(char *buf, size_t bufsz, const char *fmt, const char *ch
 					a += strlen(channel);
 					sz -= strlen(channel);
 					break;
-				case 'E':
+				case 'E': ;
 					char tmp[32];
 					snprintf(tmp, sizeof tmp, "%ld", s->rawepoch);
 					if(sz < strlen(tmp))
@@ -127,7 +127,7 @@ bool store_format_parse(char *buf, size_t bufsz, const char *fmt, const char *ch
 	if(!sz)
 		return false;
 
-fuckthisshit:
+fuckthisshit: ;
 	time_t t = time(NULL);
 	struct tm *tm = localtime(&t);
 	strftime(buf, bufsz, temp, tm);
