@@ -61,7 +61,15 @@ struct irc_message util_irc_message_parse(char *msg)
 	struct irc_message r;
 
 	r.ntok = util_tokenize(msg, r.tokarr, COUNT_OF(r.tokarr));
-	r.prefix = (r.tokarr[0][0] == ':') ? util_irc_prefix_parse(r.tokarr[0]) : {NULL, NULL, NULL};
+
+	if(r.tokarr[0][0] == ':')
+		r.prefix = util_irc_prefix_parse(r.tokarr[0]);
+	else{
+		r.prefix.nick = NULL;
+		r.prefix.user = NULL;
+		r.prefix.host = NULL;
+	}
+
 	r.cmd = (r.prefix.nick) ? 1 : 0;
 	r.middle = r.cmd + 1;
 	r.trailing = (r.tokarr[r.ntok - 1][0] == ':') ? r.ntok - 1 : -1;
