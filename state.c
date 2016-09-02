@@ -87,9 +87,11 @@ void state_channel_part(char *chan)
 
 void state_channel_client_init(int id)
 {
+	struct settings *s = sett_get();
+
 	for(int i = 0; i < MAX_CHANNELS; i++){
 		if(g_channels[i].name[0] != '\0'){
-			clt_message_sendf(id, ":%s!%s@%s JOIN %s", g_nick, g_user, core_host(), g_channels[i]);
+			clt_message_sendf(id, ":%s!%s@%s JOIN %s", g_nick, g_user, s->host, g_channels[i]);
 			srv_message_sendf("NAMES %s", g_channels[i].name); //Need to route the replies
 		}
 	}

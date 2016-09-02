@@ -88,6 +88,8 @@ void clt_tick()
 	#define SF(...) clt_message_sendf(i, __VA_ARGS__)
 	#define SN(DATA, SZ) clt_message_send(i, DATA, SZ)
 
+	struct settings *s = sett_get();
+	
 	for(int i = 0; i < MAX_CLIENTS; i++){
 		switch (g_clients[i].state) {
 			case CLIENT_STATE_EMPTY:
@@ -95,10 +97,10 @@ void clt_tick()
 			case CLIENT_STATE_REGISTER:
 				break;
 			case CLIENT_STATE_INIT:
-				SF(":%s 001 %s :Welcome to sBNC, %s", core_host(), state_nick(), state_nick());
-				SF(":%s 002 %s :Your host is %s, running version "VERSION, core_host(), state_nick(), core_host());
-				SF(":%s 003 %s :This server was created %s", core_host(), state_nick(), core_epoch());
-				SF(":%s 004 %s :%s %s sBNC-"VERSION" %s", core_host(), state_nick(), core_host(), state_server_umodes(), state_server_cmodes());
+				SF(":%s 001 %s :Welcome to sBNC, %s", s->host, state_nick(), state_nick());
+				SF(":%s 002 %s :Your host is %s, running version "VERSION, s->host, state_nick(), s->host);
+				SF(":%s 003 %s :This server was created %s", s->host, state_nick(), core_epoch());
+				SF(":%s 004 %s :%s %s sBNC-"VERSION" %s", s->host, state_nick(), s->host, state_server_umodes(), state_server_cmodes());
 				state_server_005(i);
 				srv_message_sendf("LUSERS"); //Need to route the replies somehow
 				srv_message_sendf("MOTD");   //ditto
@@ -107,7 +109,7 @@ void clt_tick()
 				break;
 			case CLIENT_STATE_READY:
 				if(time(NULL) - g_clients[i].lastact > 60)
-					SF(":%s PING :%s", core_host(), core_host());
+					SF(":%s PING :%s", s->host, s->host);
 				if(g_clients[i].needs_playback){
 					state_buffer_play(i);
 					g_clients[i].needs_playback = false;

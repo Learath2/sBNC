@@ -20,6 +20,7 @@ struct settings{
 	char spath[256];
 	char sfmt[128];
 	bool sjoin;
+	char host[64];
 
 	char nick[64];
 	char uname[64];
