@@ -11,10 +11,12 @@
 #include "sett.h"
 #include "log.h"
 
+void mkdir_r(char *p); //Will implement in platform.c
+
 void store_init()
 {
 	struct settings *s = sett_get();
-	//mkdir_r(s->spath); //Will implement in platform.c
+	mkdir_r(s->spath);
 }
 
 void store_msg(char *msg)
@@ -56,7 +58,7 @@ bool store_store(char *path, char *msg)
 {
 	char buf[2048];
 	time_t t = time(NULL);
-	struct tm tm = localtime(&t);
+	struct tm *tm = localtime(&t);
 
 	strftime(buf, sizeof buf, "%T ", tm);
 	strcat(buf, msg);
@@ -127,7 +129,7 @@ bool store_format_parse(char *buf, size_t bufsz, const char *fmt, const char *ch
 
 fuckthisshit:
 	time_t t = time(NULL);
-	struct tm tm = localtime(&t);
+	struct tm *tm = localtime(&t);
 	strftime(buf, bufsz, temp, tm);
 	free(temp);
 	return true;
