@@ -89,7 +89,7 @@ void clt_tick()
 	#define SN(DATA, SZ) clt_message_send(i, DATA, SZ)
 
 	for(int i = 0; i < MAX_CLIENTS; i++){
-		switch g_clients[i].state{
+		switch (g_clients[i].state) {
 			case CLIENT_STATE_EMPTY:
 				continue;
 			case CLIENT_STATE_REGISTER:

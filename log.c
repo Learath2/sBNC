@@ -20,27 +20,33 @@ int g_fverb = LOGGER_ERROR;
 bool g_prettytime = false;
 bool g_color = false;
 
-void log_file_set(char *filename){
+void log_file_set(char *filename)
+{
 	g_file = util_strdup(filename);
 }
 
-void log_cverb_set(int lvl){
+void log_cverb_set(int lvl)
+{
 	g_cverb = lvl;
 }
 
-void log_fverb_set(int lvl){
+void log_fverb_set(int lvl)
+{
 	g_fverb = lvl;
 }
 
-void log_color_set(bool t){
+void log_color_set(bool t)
+{
 	g_color = t;
 }
 
-void log_prettytime_set(bool t){
+void log_prettytime_set(bool t)
+{
 	g_prettytime = t;
 }
 
-char *log_color_get4lvl(int lvl){
+char *log_color_get4lvl(int lvl)
+{
 	switch (lvl){
 		case LOGGER_ERROR:
 			return g_colors[RED];

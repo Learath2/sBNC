@@ -17,4 +17,12 @@ enum {
 	LOGGER_DEBUG
 };
 
+void log_file_set(char *filename);
+void log_cverb_set(int lvl);
+void log_fverb_set(int lvl);
+void log_color_set(bool t);
+void log_prettytime_set(bool t);
+char *log_color_get4lvl(int lvl);
+void log_log(int lvl, const char *fmt, ...);
+
 #endif
