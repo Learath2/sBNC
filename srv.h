@@ -1,3 +1,6 @@
+#ifndef SRV_H_
+#define SRV_H_
+
 typedef enum {
 	SRV_STATE_OFFLINE = -1,
 	SRV_STATE_CONNECTED,
@@ -11,3 +14,5 @@ int srv_socket(void);
 void srv_message_process(char *buf);
 void srv_message_sendf(const char *format, ... );
 void srv_message_send(void *data, size_t datasz);
+
+#endif

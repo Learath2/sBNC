@@ -1,4 +1,5 @@
-#include <stdbool.h>
+#ifndef STATE_H_
+#define STATE_H_
 
 bool state_nick_set(char *nick);
 const char *state_nick();
@@ -17,3 +18,5 @@ void state_mark_away();
 void state_unmark_away();
 void state_buffer(char *channel, char* msg);
 void state_buffer_play(int clid);
+
+#endif

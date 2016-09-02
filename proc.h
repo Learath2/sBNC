@@ -1,3 +1,6 @@
+#ifndef PROC_H_
+#define PROC_H_
+
 typedef struct wqueue_entry *wqueue_entry_t;
 
 #define ENT_GET(ENTRY, FIELD) proc_wqueue_entry_##FIELD(ENTRY)
@@ -12,3 +15,5 @@ size_t proc_wqueue_entry_datasz(wqueue_entry_t d)
 
 void proc_tick();
 void proc_read(int fd, char *buf);
+
+#endif

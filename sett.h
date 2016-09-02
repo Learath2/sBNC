@@ -1,4 +1,5 @@
-#include <stdbool.h>
+#ifndef SETT_H_
+#define SETT_H_
 
 struct server{
 	char host[128];
@@ -25,3 +26,5 @@ struct settings{
 };
 
 struct settings *sett_get(void);
+
+#endif

@@ -1,3 +1,6 @@
+#ifndef LOG_H_
+#define LOG_H_
+
 #define LOG(LVL, FMT, ...) log_log(LVL, "[%s]"FMT, MODULE_NAME, __VA_ARGS__)
 #define ALL(FMT, ...) LOG(LOGGER_ALL, FMT, __VA_ARGS__)
 #define ERR(FMT, ...) LOG(LOGGER_ERROR, FMT, __VA_ARGS__)
@@ -13,3 +16,5 @@ enum {
 	LOGGER_INFO,
 	LOGGER_DEBUG
 };
+
+#endif

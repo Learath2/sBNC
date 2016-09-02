@@ -1,4 +1,5 @@
-#include <stdbool.h>
+#ifndef CLT_H_
+#define CLT_H_
 
 typedef enum{
 	CLIENT_STATE_EMPTY = -1,
@@ -26,3 +27,5 @@ int clt_accept(void);
 void clt_message_process(int fd, char *buf);
 void clt_message_sendf(int id, const char *format, ... )
 void clt_message_send(int fd, void *data, size_t datasz);
+
+#endif

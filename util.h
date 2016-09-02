@@ -1,3 +1,9 @@
+#ifndef UTIL_H_
+#define UTIL_H_
+
+#include <stddef.h>
+#include <stdbool.h>
+
 #define COUNT_OF(x) ((sizeof(x)/sizeof(0[x])) / ((size_t)(!(sizeof(x) % sizeof(0[x])))))
 #define XSTR(s) STR(s)
 #define STR(s) #s
@@ -27,3 +33,5 @@ struct irc_message util_irc_message_parse(char *msg);
 struct irc_prefix util_irc_prefix_parse(char *prefix);
 void util_irc_prefix_construct(char *buf, size_t bufsz, struct irc_prefix p);
 void util_parse_hostspec(char *host, size_t sz, int *port, bool *ssl, char *hostspec);
+
+#endif
