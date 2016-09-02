@@ -85,7 +85,7 @@ int clt_init(int port)
 
 void clt_tick()
 {
-	#define SF(...) clt_message_sendf(i, __VA_VARGS__)
+	#define SF(...) clt_message_sendf(i, __VA_ARGS__)
 	#define SN(DATA, SZ) clt_message_send(i, DATA, SZ)
 
 	for(int i = 0; i < MAX_CLIENTS; i++){
@@ -94,7 +94,7 @@ void clt_tick()
 				continue;
 			case CLIENT_STATE_REGISTER:
 				break;
-			case CLIENT STATE_INIT:
+			case CLIENT_STATE_INIT:
 				SF(":%s 001 %s :Welcome to sBNC, %s", core_host(), state_nick(), state_nick());
 				SF(":%s 002 %s :Your host is %s, running version "VERSION, core_host(), state_nick(), core_host());
 				SF(":%s 003 %s :This server was created %s", core_host(), state_nick(), core_epoch());
@@ -156,7 +156,7 @@ void clt_message_process(int fd, char *buf)
 		return;
 	}
 
-	srv_send_msg(buf, strlen(buf));
+	srv_message_send(buf, strlen(buf));
 }
 
 void clt_message_sendf(int id, const char *format, ... )
@@ -167,13 +167,13 @@ void clt_message_sendf(int id, const char *format, ... )
 	int n = vsnprintf(buf, sizeof buf, format, args);
 	va_end(args);
 
-	if(n < buf)
+	if(n < sizeof buf)
 		clt_message_send(id, buf, n);
 }
 
 void clt_message_send(int id, void *data, size_t datasz)
 {
-	if(fd > 0)
+	if(id > 0)
 		proc_wqueue_add(g_clients[id].fd, data, datasz);
 	else
 		for(int i = 0; i < MAX_CLIENTS; i++)
