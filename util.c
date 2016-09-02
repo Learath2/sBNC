@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -107,7 +108,7 @@ void util_irc_prefix_construct(char *buf, size_t bufsz, struct irc_prefix p)
 	snprintf(buf, bufsz, "%s!%s@%s", p.nick, p.user, p.host);
 }
 
-void util_parse_hostspec(char *host, size_t sz, int *port, bool *ssl, char *hostspec)
+void util_parse_hostspec(char *host, size_t sz, int **port, bool **ssl, const char *hostspec)
 {
 	if(hostspec[0] == '!')
 		*ssl = true;
@@ -116,7 +117,7 @@ void util_parse_hostspec(char *host, size_t sz, int *port, bool *ssl, char *host
 		*sep = '\0';
 	util_strncpy(host, hostspec, sz);
 	if(sep)
-		*port = strtol(sep[1], NULL, 10);
+		*port = strtol(sep + 1, NULL, 10);
 	else
 		*port = 6667;
 }
