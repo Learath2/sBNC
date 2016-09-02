@@ -1,3 +1,5 @@
+#include <stdbool.h>
+
 typedef enum{
 	CLIENT_STATE_EMPTY = -1,
 	CLIENT_STATE_REGISTER = 0,

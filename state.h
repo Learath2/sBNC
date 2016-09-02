@@ -1,3 +1,5 @@
+#include <stdbool.h>
+
 bool state_nick_set(char *nick);
 const char *state_nick();
 const char *state_server_umodes();

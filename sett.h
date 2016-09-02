@@ -1,3 +1,5 @@
+#include <stdbool.h>
+
 struct server{
 	char host[128];
 	int port;
