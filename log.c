@@ -1,6 +1,9 @@
+#include <stdio.h>
+#include <string.h>
 #include <time.h>
 #include <stdarg.h>
 
+#include "util.h"
 #include "log.h"
 
 #define RED 1
@@ -12,7 +15,7 @@
 #define WHT 7
 #define RST 0
 
-const char g_colors[8][8] = {"\x1B[0m", "\x1B[31m", "\x1B[32m", "\x1B[33m", "\x1B[34m", "\x1B[35m", "\x1B[36m", "\x1B[37m"};
+char g_colors[8][8] = {"\x1B[0m", "\x1B[31m", "\x1B[32m", "\x1B[33m", "\x1B[34m", "\x1B[35m", "\x1B[36m", "\x1B[37m"};
 
 int g_cverb = LOGGER_INFO;
 char *g_file = NULL;
