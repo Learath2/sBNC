@@ -1,6 +1,8 @@
 #define MODULE_NAME "init"
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 #include "util.h"
 #include "core.h"
@@ -59,8 +61,8 @@ void process_args(int *argc, char ***argv)
 			case 'V':
 				puts("sBNC-"VERSION);
 				break;
-			case 'i':
-				CSET(s->host); //Should probably set this with reverse DNS or /etc/hostname
+			case 'i': //Should probably set this with reverse DNS or /etc/hostname
+				CSET(s->host); 
 				break;
 			case 'r':
 				CSET(s->spath);

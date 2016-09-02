@@ -5,6 +5,7 @@
 #include <arpa/inet.h>
 #include <string.h>
 #include <stdarg.h>
+#include <stdio.h>
 
 #include "util.h"
 #include "clt.h"
