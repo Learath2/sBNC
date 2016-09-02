@@ -9,6 +9,7 @@
 #define STR(s) #s
 
 #define MAX_TOKENS 20
+#define VERSION "0.0.1" //Definately doesn't belong here
 
 struct irc_prefix{
 	char *nick;

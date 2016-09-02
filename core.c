@@ -14,7 +14,6 @@
 #define LISTENER 0
 #define SERVER 1
 #define POLLTIMEOUT 1 * 60 * 1000
-#define VERSION "0.0.1"
 
 int core_run(void)
 {
