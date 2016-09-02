@@ -1,8 +1,4 @@
 typedef enum{
-
-} clt_state_t;
-
-typedef enum{
 	CLIENT_STATE_EMPTY = -1,
 	CLIENT_STATE_REGISTER = 0,
 	CLIENT_STATE_INIT,

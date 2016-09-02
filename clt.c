@@ -8,11 +8,8 @@
 #define MAX_CLIENTS 10
 
 int g_socket = -1;
-clt_state_t g_state = -1;
 int g_nclients = 0;
 struct client g_clients[MAX_CLIENTS];
-
-clt_state_t clt_state() { return g_state; }
 
 int clt_clients_get_id(int fd)
 {
