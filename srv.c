@@ -1,13 +1,20 @@
 #define MODULE_NAME "srv"
 
+#include <sys/types.h>
 #include <sys/socket.h>
+#include <netdb.h>
 #include <sys/ioctl.h>
 #include <arpa/inet.h>
 #include <string.h>
 #include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "util.h"
+#include "state.h"
 #include "srv.h"
+#include "clt.h"
+#include "proc.h"
 #include "sett.h"
 #include "log.h"
 
@@ -30,11 +37,11 @@ int srv_connect()
 	struct settings *s = sett_get();
 	struct sockaddr_in srv_addr;
 
-	memset(srv_addr, 0, sizeof srv_addr);
+	memset(&srv_addr, 0, sizeof srv_addr);
 	srv_addr.sin_family		= AF_INET;
 	srv_addr.sin_port		= htons(s->server.port);
 	getaddrinfo();//TODO:Finish this up
-	inet_pton(AF_INET, host, &srv_addr.sin_addr);
+	inet_pton(AF_INET, s->host, &srv_addr.sin_addr);
 	if(connect(g_socket, (struct sockaddr *)&srv_addr, sizeof srv_addr))
 		return -1;
 
@@ -65,7 +72,7 @@ void srv_message_process(char *buf)
 	else if(me && !strcmp(m.tokarr[m.cmd], "JOIN")){
 		for(int i = m.middle; i < m.ntok; i++){
 			if(m.tokarr[i][0] == '#' || m.tokarr[i][0] == '&')
-				state_channel_join(tokarr[i]);
+				state_channel_join(m.tokarr[i]);
 			else
 				break;
 		}
@@ -74,7 +81,7 @@ void srv_message_process(char *buf)
 	else if(me && !strcmp(m.tokarr[m.cmd], "PART")){
 		for(int i = m.middle; i < m.ntok; i++)
 			if(m.tokarr[i][0] == '#' || m.tokarr[i][0] == '&')
-				state_channel_part(tokarr[i]);
+				state_channel_part(m.tokarr[i]);
 		return;
 	}
 	else if(me && !strcmp(m.tokarr[m.cmd], "004")){
@@ -92,7 +99,7 @@ void srv_message_process(char *buf)
 	}
 	free(tmp);
 
-	clt_send_message(-1, buf, strlen(buf));
+	clt_message_send(-1, buf, strlen(buf));
 }
 
 void srv_message_sendf(const char *format, ... )
@@ -103,7 +110,7 @@ void srv_message_sendf(const char *format, ... )
 	int n = vsnprintf(buf, sizeof buf, format, args);
 	va_end(args);
 
-	if(n > 0 && n < buf)
+	if(n > 0 && n < sizeof buf)
 		srv_message_send(buf, n);
 }
 
@@ -112,4 +119,5 @@ void srv_message_send(void *data, size_t datasz)
 	proc_wqueue_add(g_socket, data, datasz);
 }
 
-#undef
+#undef MODULE_NAME
+
