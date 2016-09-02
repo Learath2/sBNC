@@ -1,6 +1,8 @@
 #define MODULE_NAME "core"
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <poll.h>
 
 #include "util.h"
 #include "core.h"
@@ -9,8 +11,10 @@
 #include "proc.h"
 #include "store.h"
 #include "state.h"
+#include "sett.h"
 #include "log.h"
 
+#define MAX_SOCKETS 25
 #define LISTENER 0
 #define SERVER 1
 #define POLLTIMEOUT 1 * 60 * 1000
@@ -24,7 +28,7 @@ int core_run(void)
 	store_init();
 	
 	s_server = srv_init();
-	if(srv_connect(s->server) == -1){
+	if(srv_connect() == -1){
 		ERR("srv_connect() failed. Exiting...");
 		return EXIT_FAILURE;
 	}
