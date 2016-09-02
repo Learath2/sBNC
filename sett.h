@@ -29,5 +29,7 @@ struct settings{
 };
 
 struct settings *sett_get(void);
+void sett_init(void);
+void sett_dump(void);
 
 #endif

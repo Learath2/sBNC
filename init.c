@@ -66,10 +66,10 @@ void process_args(int *argc, char ***argv)
 				break;
 			case 'r':
 				CSET(s->spath);
-				break
+				break;
 			case 'f':
 				CSET(s->sfmt);
-				break
+				break;
 			case 'j':
 				s->sjoin = true;
 				break;
@@ -117,7 +117,7 @@ void process_args(int *argc, char ***argv)
 		ERR("No hostspec given.");
 		usage(stderr, a0, EXIT_FAILURE, true);
 	}
-	util_parse_hostspec(&s->server.host, sizeof s->server.host, &s->server.port, &s->server.ssl, (*argv)[0]);
+	util_parse_hostspec(s->server.host, sizeof s->server.host, &s->server.port, &s->server.ssl, (*argv)[0]);
 }
 
 int main(int argc, char **argv)
