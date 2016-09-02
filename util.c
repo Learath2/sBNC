@@ -1,3 +1,6 @@
+#include <stdlib.h>
+#include <string.h>
+
 #include "util.h"
 
 void *util_dup(const void *src, size_t len)
@@ -48,7 +51,7 @@ int util_tokenize(char *buf, char **tokarr, size_t toksize)
 		tokarr[ntok++] == &buf[i];
 		if(i && buf[i] == ':') break; //Trailing
 		while(i < len && buf[i] != ' ') i++;
-		buffer[i++] = '\0';
+		buf[i++] = '\0';
 	}
 	return ntok;
 }
@@ -56,11 +59,13 @@ int util_tokenize(char *buf, char **tokarr, size_t toksize)
 struct irc_message util_irc_message_parse(char *msg)
 {
 	struct irc_message r;
+	r.prefix = {NULL, NULL, NULL}
+
 	r.ntok = util_tokenize(msg, r.tokarr, COUNT_OF(r.tokarr));
 	r.prefix = (r.tokarr[0][0] == ':') ? util_irc_prefix_parse(r.tokarr[0]) : {0};
-	r.cmd = (r.prefix) ? 1 : 0;
+	r.cmd = (r.prefix.nick) ? 1 : 0;
 	r.middle = r.cmd + 1;
-	r.trailing = (r.tokarr[ntok - 1][0] == ':') ? ntok - 1 : -1;
+	r.trailing = (r.tokarr[r.ntok - 1][0] == ':') ? ntok - 1 : -1;
 
 	return r;
 }
