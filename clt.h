@@ -27,7 +27,7 @@ int clt_init(int port);
 int clt_tick(void);
 int clt_accept(void);
 void clt_message_process(int fd, char *buf);
-void clt_message_sendf(int id, const char *format, ... )
+void clt_message_sendf(int id, const char *format, ... );
 void clt_message_send(int fd, void *data, size_t datasz);
 
 #endif
