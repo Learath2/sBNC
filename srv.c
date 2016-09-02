@@ -52,7 +52,7 @@ int srv_socket(){ return g_socket; }
 
 void srv_message_process(char *buf)
 {
-	INF(buf);
+	INFF("%s", buf);
 
 	char *tmp = util_strdup(buf);
 	struct irc_message m = util_irc_message_parse(tmp);
