@@ -67,7 +67,6 @@ void proc_tick(void)
 
 void proc_read(int fd, char *buf)
 {
-	DBGF("msg %s", buf);
 	if(fd == srv_socket())
 		srv_message_process(buf);
 	else
