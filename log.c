@@ -72,7 +72,7 @@ void log_log(int lvl, const char *fmt, ...)
 	if(g_prettytime){
 		time_t t = time(NULL);
 		struct tm *tm = localtime(&t);
-		strftime(result, sizeof result, "[%d/%m/%y %H:%M:%S]", tm);
+		strftime(result, sizeof result, "[%d/%m/%Y %H:%M:%S]", tm);
 		strcat(result, data);
 	}
 	else
