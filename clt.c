@@ -59,7 +59,7 @@ void clt_clients_remove_fd(int fd)
 }
 
 //TODO: Check for errors :P
-int clt_init()
+int clt_init(void)
 {
 	struct settings *s = sett_get();
 
@@ -88,7 +88,7 @@ int clt_init()
 	return g_socket;
 }
 
-void clt_tick()
+void clt_tick(void)
 {
 	#define SF(...) clt_message_sendf(i, __VA_ARGS__)
 	#define SN(DATA, SZ) clt_message_send(i, DATA, SZ)
@@ -127,7 +127,7 @@ void clt_tick()
 	#undef SN
 }
 
-int clt_accept()
+int clt_accept(void)
 {
 	if(g_nclients == MAX_CLIENTS)
 		return -2;

@@ -42,9 +42,9 @@ bool state_nick_set(char *nick)
 	return true;
 }
 
-const char *state_nick() { return g_nick; }
-const char *state_server_umodes() { return g_sumodes; }
-const char *state_server_cmodes() { return g_scmodes; }
+const char *state_nick(void) { return g_nick; }
+const char *state_server_umodes(void) { return g_sumodes; }
+const char *state_server_cmodes(void) { return g_scmodes; }
 
 void state_server_umodes_set(char *s)
 {
@@ -106,14 +106,14 @@ void state_channel_client_init(int id)
 	}
 }
 
-bool state_is_away() { return g_away; }
+bool state_is_away(void) { return g_away; }
 
-void state_mark_away()
+void state_mark_away(void)
 {
 	g_away = true;
 }
 
-void state_unmark_away()
+void state_unmark_away(void)
 {
 	g_away = false;
 	for(int i = 0; i < MAX_CHANNELS; i++)

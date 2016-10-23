@@ -43,7 +43,7 @@ void proc_wqueue_add(int target, void *data, size_t datasz)
 	g_wqueue.length++;
 }
 
-void proc_wqueue_next()
+void proc_wqueue_next(void)
 {
 	struct wqueue_entry *t = g_wqueue.head;
 	g_wqueue.head = g_wqueue.head->next;
@@ -56,13 +56,13 @@ void proc_wqueue_next()
 	free(t);
 }
 
-size_t proc_wqueue_length(){ return g_wqueue.length; }
-wqueue_entry_t proc_wqueue_head(){ return g_wqueue.head; }
+size_t proc_wqueue_length(void){ return g_wqueue.length; }
+wqueue_entry_t proc_wqueue_head(void){ return g_wqueue.head; }
 int proc_wqueue_entry_target(wqueue_entry_t d){ return d->target; }
 void *proc_wqueue_entry_data(wqueue_entry_t d){ return d->data; }
 size_t proc_wqueue_entry_datasz(wqueue_entry_t d){ return d->datasz; }
 
-void proc_tick()
+void proc_tick(void)
 {
 	clt_tick();
 }

@@ -22,7 +22,7 @@
 static int g_socket = 0;
 static srv_state_t g_state = SRV_STATE_OFFLINE;
 
-int srv_init()
+int srv_init(void)
 {
 	int re = 1;
 
@@ -33,7 +33,7 @@ int srv_init()
 	return g_socket;
 }
 
-int srv_connect()
+int srv_connect(void)
 {
 	struct settings *s = sett_get();
 	struct addrinfo hints, *res;
@@ -56,8 +56,8 @@ int srv_connect()
 	return 0;
 }
 
-srv_state_t srv_state(){ return g_state; }
-int srv_socket(){ return g_socket; }
+srv_state_t srv_state(void){ return g_state; }
+int srv_socket(void){ return g_socket; }
 
 void srv_message_process(char *buf)
 {

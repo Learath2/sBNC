@@ -11,7 +11,7 @@
 #include "sett.h"
 #include "log.h"
 
-void store_init()
+void store_init(void)
 {
 	struct settings *s = sett_get();
 	util_mkdir_r(s->spath); //TODO: Implement this in platform.c
