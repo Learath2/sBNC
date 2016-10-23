@@ -1,12 +1,12 @@
 #ifndef LOG_H_
 #define LOG_H_
 
-#define LOG(LVL, MSG, ...) log_log(LVL, "[%s]"MSG, MODULE_NAME)
-#define ALL(MSG, ...) LOG(LOGGER_ALL, MSG)
-#define ERR(MSG, ...) LOG(LOGGER_ERROR, MSG)
-#define WRN(MSG, ...) LOG(LOGGER_WARN, MSG)
-#define INF(MSG, ...) LOG(LOGGER_INFO, MSG)
-#define DBG(MSG, ...) LOG(LOGGER_DEBUG, MSG)
+#define LOG(LVL, MSG) log_log(LVL, "[%s]"MSG, MODULE_NAME)
+#define ALL(MSG) LOG(LOGGER_ALL, MSG)
+#define ERR(MSG) LOG(LOGGER_ERROR, MSG)
+#define WRN(MSG) LOG(LOGGER_WARN, MSG)
+#define INF(MSG) LOG(LOGGER_INFO, MSG)
+#define DBG(MSG) LOG(LOGGER_DEBUG, MSG)
 
 #define LOGF(LVL, FMT, ...) log_log(LVL, "[%s]"FMT, MODULE_NAME, __VA_ARGS__)
 #define ALLF(FMT, ...) LOGF(LOGGER_ALL, FMT, __VA_ARGS__)

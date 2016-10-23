@@ -31,7 +31,7 @@ static char g_nick[10];
 static char g_user[32];
 static bool g_away = false;
 
-struct channel g_channels[MAX_CHANNELS] = {{"", NULL}};
+struct channel g_channels[MAX_CHANNELS] = {{"", NULL, 0}};
 int g_nchannels = 0;
 
 bool state_nick_set(char *nick)
