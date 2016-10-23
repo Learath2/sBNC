@@ -28,6 +28,7 @@ int clt_clients_get_id(int fd)
 	for(int i = 0; i < MAX_CLIENTS; i++)
 		if(g_clients[i].fd == fd)
 			return i;
+	return -1;
 }
 
 int clt_clients_add(int fd)
@@ -64,7 +65,7 @@ int clt_init(void)
 	struct settings *s = sett_get();
 
 	struct sockaddr_in clt_addr;
-	int re = 1, rc = 0;
+	int re = 1;
 
 	g_socket = socket(AF_INET, SOCK_STREAM, 0);
 	setsockopt(g_socket, SOL_SOCKET, SO_REUSEADDR, &re, sizeof re);

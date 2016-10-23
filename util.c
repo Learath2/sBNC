@@ -50,7 +50,7 @@ int util_tokenize(char *buf, char **tokarr, size_t toksize)
 
 	for(int i = 0; i < len; i++){
 		while(i < len && buf[i] == ' ') i++; //Discard leading whitespace
-		tokarr[ntok++] == &buf[i];
+		tokarr[ntok++] = &buf[i];
 		if(i && buf[i] == ':') break; //Trailing
 		while(i < len && buf[i] != ' ') i++;
 		buf[i++] = '\0';
