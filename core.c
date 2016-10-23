@@ -76,7 +76,7 @@ int core_run(void)
 					int len = 0;
 					if((len = recv(fds[i].fd, buffer, sizeof buffer, 0)) < 0)
 						break;
-					buffer[len+1] = '\0'; //Ensure NULL Termination
+					buffer[len] = '\0'; //Ensure NULL Termination
 					proc_read(fds[i].fd, buffer);
 				}
 			}

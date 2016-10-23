@@ -46,15 +46,16 @@ int util_tokenize(char *buf, char **tokarr, size_t toksize)
 		return 0;
 
 	int ntok = 0;
-	int len = strlen(buf);
+	bool done = false;
 
-	for(int i = 0; i < len; i++){
-		while(i < len && buf[i] == ' ') i++; //Discard leading whitespace
+	for(int i = 0; !done && buf[i] != '\0';){
+		while(buf[i] && buf[i] == ' ') i++;
 		tokarr[ntok++] = &buf[i];
-		if(i && buf[i] == ':') break; //Trailing
-		while(i < len && buf[i] != ' ') i++;
+		while(buf[i] && (buf[i] != ' ' && buf[i] != '\r' && buf[i] != '\n')) i++;
+		if(buf[i] == '\r' || buf[i] == '\n') done = true;
 		buf[i++] = '\0';
 	}
+
 	return ntok;
 }
 
