@@ -35,14 +35,16 @@ int srv_init()
 int srv_connect()
 {
 	struct settings *s = sett_get();
-	struct sockaddr_in srv_addr;
+	struct addrinfo hints, *res;
 
-	memset(&srv_addr, 0, sizeof srv_addr);
-	srv_addr.sin_family		= AF_INET;
-	srv_addr.sin_port		= htons(s->server.port);
-	getaddrinfo();//TODO:Finish this up
-	inet_pton(AF_INET, s->server.host, &srv_addr.sin_addr);
-	if(connect(g_socket, (struct sockaddr *)&srv_addr, sizeof srv_addr))
+	memset(&hints, 0, sizeof hints);
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+	char port[7];
+	snprintf(port, sizeof port ,"%d", s->server.port);
+	getaddrinfo(s->server.host, port, &hints, &res);
+
+	if(connect(g_socket, res->ai_addr, res->ai_addrlen))
 		return -1;
 
 	srv_message_sendf("PASS %s", s->server.pass);

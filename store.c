@@ -14,7 +14,7 @@
 void store_init()
 {
 	struct settings *s = sett_get();
-	mkdir_r(s->spath); //TODO: Implement this in platform.c
+	util_mkdir_r(s->spath); //TODO: Implement this in platform.c
 }
 
 void store_msg(char *msg)
@@ -27,7 +27,7 @@ void store_msg(char *msg)
 		char path[1024], buf[1024];
 
 		store_format_parse(path, sizeof path, s->sfmt, m.tokarr[m.middle]);
-		mkdir_r(path);
+		util_mkdir_r(path);
 
 		util_irc_prefix_construct(buf, sizeof buf, m.prefix);
 		strcat(buf, ": ");
@@ -38,7 +38,7 @@ void store_msg(char *msg)
 		char path[1024], buf[1024];
 
 		store_format_parse(path, sizeof path, s->sfmt, m.tokarr[m.middle]);
-		mkdir_r(path);
+		util_mkdir_r(path);
 
 		util_irc_prefix_construct(buf, sizeof buf, m.prefix);
 		strcat(buf, " ");

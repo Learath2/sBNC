@@ -78,13 +78,13 @@ void log_log(int lvl, const char *fmt, ...)
 	else
 		sprintf(result, "[%ld]%s\n", time(NULL), data);
 
-	if(lvl < g_cverb){
+	if(lvl <= g_cverb){
 		FILE *str = (lvl < LOGGER_INFO) ? stderr : stdout;
 		if(g_color) fputs(log_color_get4lvl(lvl), str);
 		fputs(result, str);
 		if(g_color) fputs(g_colors[RST], str);
 	}
-	if(g_file && lvl < g_fverb){
+	if(g_file && lvl <= g_fverb){
 		FILE *f = fopen(g_file, "a");
 		fputs(result, f);
 		fclose(f);

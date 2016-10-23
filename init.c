@@ -61,6 +61,7 @@ void process_args(int *argc, char ***argv)
 				break;
 			case 'V':
 				puts("sBNC-"VERSION);
+				exit(EXIT_SUCCESS);
 				break;
 			case 'i': //Should probably set this with reverse DNS or /etc/hostname
 				CSET(s->host); 

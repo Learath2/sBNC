@@ -36,5 +36,6 @@ struct irc_message util_irc_message_parse(char *msg);
 struct irc_prefix util_irc_prefix_parse(char *prefix);
 void util_irc_prefix_construct(char *buf, size_t bufsz, struct irc_prefix p);
 void util_parse_hostspec(char *host, size_t sz, int *port, bool *ssl, const char *hostspec);
+void util_mkdir_r(char *path);
 
 #endif

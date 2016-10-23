@@ -9,11 +9,11 @@
 #define DBG(MSG, ...) LOG(LOGGER_DEBUG, MSG)
 
 #define LOGF(LVL, FMT, ...) log_log(LVL, "[%s]"FMT, MODULE_NAME, __VA_ARGS__)
-#define ALLF(FMT, ...) LOG(LOGGER_ALL, FMT, __VA_ARGS__)
-#define ERRF(FMT, ...) LOG(LOGGER_ERROR, FMT, __VA_ARGS__)
-#define WRNF(FMT, ...) LOG(LOGGER_WARN, FMT, __VA_ARGS__)
-#define INFF(FMT, ...) LOG(LOGGER_INFO, FMT, __VA_ARGS__)
-#define DBGF(FMT, ...) LOG(LOGGER_DEBUG, FMT, __VA_ARGS__)
+#define ALLF(FMT, ...) LOGF(LOGGER_ALL, FMT, __VA_ARGS__)
+#define ERRF(FMT, ...) LOGF(LOGGER_ERROR, FMT, __VA_ARGS__)
+#define WRNF(FMT, ...) LOGF(LOGGER_WARN, FMT, __VA_ARGS__)
+#define INFF(FMT, ...) LOGF(LOGGER_INFO, FMT, __VA_ARGS__)
+#define DBGF(FMT, ...) LOGF(LOGGER_DEBUG, FMT, __VA_ARGS__)
 
 enum {
 	LOGGER_ALL=-1,

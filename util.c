@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 
 #include "util.h"
 
@@ -120,4 +121,19 @@ void util_parse_hostspec(char *host, size_t sz, int *port, bool *ssl, const char
 		*port = strtol(sep + 1, NULL, 10);
 	else
 		*port = 6667;
+}
+
+void util_mkdir_r(char *path)
+{
+	char buf[2048];
+	util_strncpy(buf, path, sizeof buf);
+	for(char *p = buf + 1; *p != '\0'; p++)
+	{
+		if(*p == '/' && *(p+1) != '\0')
+		{
+			*p = '\0';
+			mkdir(buf, 0755);
+			*p = '/';
+		}
+	}
 }

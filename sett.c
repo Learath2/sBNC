@@ -46,16 +46,16 @@ void sett_dump(void)
 	DBGF("username = %s", g_sett.uname);
 	DBGF("realname = %s", g_sett.rname);
 	DBGF("host = %s", g_sett.host);
-	DBGF("port = %s", g_sett.port);
+	DBGF("port = %d", g_sett.port);
 	DBG("store:");
 	DBGF("\tpath = %s", g_sett.spath);
 	DBGF("\tformat = %s", g_sett.sfmt);
-	DBGF("\tjoin = %s", g_sett.sjoin ? "true", "false");
+	DBGF("\tjoin = %s", g_sett.sjoin ? "true": "false");
 	DBG("server:");
 	DBGF("\thost = %s", g_sett.server.host);
 	DBGF("\tport = %d", g_sett.server.port);
 	DBGF("\tpass = %s", g_sett.server.pass);
-	DBGF("\tssl = %s", g_sett.server.ssl ? "true", "false");
+	DBGF("\tssl = %s", g_sett.server.ssl ? "true": "false");
 }
 
 #undef MODULE_NAME
