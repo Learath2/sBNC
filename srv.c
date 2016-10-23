@@ -9,6 +9,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 
 #include "util.h"
 #include "state.h"
@@ -44,10 +45,11 @@ int srv_connect()
 	snprintf(port, sizeof port ,"%d", s->server.port);
 	getaddrinfo(s->server.host, port, &hints, &res);
 
-	if(connect(g_socket, res->ai_addr, res->ai_addrlen))
+	if(connect(g_socket, res->ai_addr, res->ai_addrlen) && errno != EINPROGRESS)
 		return -1;
 
-	srv_message_sendf("PASS %s", s->server.pass);
+	if(s->server.pass[0] != '\0')
+		srv_message_sendf("PASS %s", s->server.pass);
 	srv_message_sendf("NICK %s", s->nick);
 	srv_message_sendf("USER %s 8 * :%s", s->uname, s->rname);
 
@@ -114,9 +116,11 @@ void srv_message_sendf(const char *format, ... )
 		srv_message_send(buf, n);
 }
 
-void srv_message_send(void *data, size_t datasz)
+void srv_message_send(char *data, size_t datasz)
 {
-	proc_wqueue_add(g_socket, data, datasz);
+	char buf[513];
+	snprintf(buf, sizeof buf, "%s\r\n", data);
+	proc_wqueue_add(g_socket, buf, datasz + 2);
 }
 
 #undef MODULE_NAME

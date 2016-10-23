@@ -5,6 +5,7 @@
 #include <poll.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <string.h>
 
 #include "util.h"
 #include "core.h"
@@ -19,7 +20,7 @@
 #define MAX_SOCKETS 25
 #define LISTENER 0
 #define SERVER 1
-#define POLLTIMEOUT 1 * 60 * 1000
+#define POLLTIMEOUT 1 * 2 * 1000
 
 int core_run(void)
 {
@@ -37,7 +38,12 @@ int core_run(void)
 		return EXIT_FAILURE;
 	}
 
-	s_listener = clt_init();
+	if((s_listener = clt_init()) == -1){
+		ERR("clt_init() failed. Exiting...");
+		return EXIT_FAILURE;
+	}
+
+	memset(fds, 0 , sizeof(fds));
 
 	fds[LISTENER].fd 		= s_listener;
 	fds[LISTENER].events 	= POLLIN;

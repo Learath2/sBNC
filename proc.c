@@ -4,6 +4,7 @@
 
 #include "util.h"
 #include "proc.h"
+#include "log.h"
 #include "clt.h"
 #include "srv.h"
 
@@ -38,6 +39,8 @@ void proc_wqueue_add(int target, void *data, size_t datasz)
 		g_wqueue.head = g_wqueue.tail = e;
 	else
 		g_wqueue.tail->next = e, g_wqueue.tail = e;
+
+	g_wqueue.length++;
 }
 
 void proc_wqueue_next()
@@ -66,6 +69,7 @@ void proc_tick()
 
 void proc_read(int fd, char *buf)
 {
+	DBGF("msg %s", buf);
 	if(fd == srv_socket())
 		srv_message_process(buf);
 	else

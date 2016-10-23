@@ -75,7 +75,8 @@ int clt_init()
 	clt_addr.sin_addr.s_addr	= htonl(INADDR_ANY);
 	clt_addr.sin_port			= htons(s->port);
 
-	bind(g_socket, (struct sockaddr *)&clt_addr, sizeof clt_addr);
+	if(bind(g_socket, (struct sockaddr *)&clt_addr, sizeof clt_addr))
+		return -1;
 
 	listen(g_socket, BACKLOG);
 
