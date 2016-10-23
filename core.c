@@ -28,7 +28,6 @@ int core_run(void)
 	bool running = true;
 
 	struct pollfd fds[MAX_SOCKETS];
-	struct settings *s = sett_get();
 
 	store_init();
 	
@@ -50,6 +49,8 @@ int core_run(void)
 
 	fds[SERVER].fd 			= s_server;
 	fds[SERVER].events		= POLLIN;
+
+	nfds = 2;
 
 	while(running){
 		int res = poll(fds, nfds, POLLTIMEOUT);
