@@ -69,19 +69,22 @@ void proc_tick(void)
 void proc_read(int fd, char *rbuf, size_t len)
 {
 	char msg[513] = "";
-	size_t sz = sizeof msg;
 
 	while(len){
+		size_t sz = sizeof msg;
 		char *a = msg;
 		char *b = rbuf;
+		char c = '\0';
+
 		while(sz--){
-			char c = (*a++ = *b++);
-			if(!c || c == '\n')
+			c = (*a++ = *b++);
+			if(!c || c == '\r' || c == '\n')
 				break;
 		}
+		if(c == '\r') b++;
 
 		if(a[-1]){
-			a[0] = '\0'; //Ensure NULL termination
+			a[-1] = '\0'; //Ensure NULL termination
 			len -= (a - &msg[0]);
 			memmove(rbuf, b, len + 1);
 

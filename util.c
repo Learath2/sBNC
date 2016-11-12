@@ -41,19 +41,19 @@ int util_clamp(int val, int min, int max)
 }
 
 int util_tokenize(char *buf, char **tokarr, size_t toksize)
-{	
+{
 	if(buf[0] == ' ') //Cant begin with whitespace
 		return 0;
 
 	int ntok = 0;
-	bool done = false;
 
-	for(int i = 0; !done && buf[i] != '\0';){
-		while(buf[i] && buf[i] == ' ') i++;
-		tokarr[ntok++] = &buf[i];
-		while(buf[i] && (buf[i] != ' ' && buf[i] != '\r' && buf[i] != '\n')) i++;
-		if(buf[i] == '\r' || buf[i] == '\n') done = true;
-		buf[i++] = '\0';
+	while(*buf && ntok < toksize){
+		tokarr[ntok++] = buf;
+		while(*buf && *buf != ' ') buf++;
+		if(!*buf)
+			break;
+		*buf++ = '\0';
+		while(*buf && *buf == ' ') buf++;
 	}
 
 	return ntok;
