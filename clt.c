@@ -84,7 +84,8 @@ int clt_init(void)
 	for(int i = 0; i < MAX_CLIENTS; i++){
 		g_clients[i].fd = -1;
 		g_clients[i].state = CLIENT_STATE_EMPTY;
-		g_clients[i].lastact = time(NULL);
+		g_clients[i].lastact = 0;
+		g_clients[i].pingsent = 9;
 	}
 	return g_socket;
 }
@@ -114,8 +115,14 @@ void clt_tick(void)
 				g_clients[i].state = CLIENT_STATE_READY;
 				break;
 			case CLIENT_STATE_READY:
-				if(time(NULL) - g_clients[i].lastact > 60)
+				if(g_clients[i].pingsent && time(NULL) - g_clients[i].pingsent > 30)
+					clt_clients_remove_id(i);
+
+				if(!g_clients[i].pingsent && time(NULL) - g_clients[i].lastping > s->hbeat){
 					SF(":%s PING :%s", s->host, s->host);
+					g_clients[i].pingsent = time(NULL);
+				}
+
 				if(g_clients[i].needs_playback){
 					state_buffer_play(i);
 					g_clients[i].needs_playback = false;
@@ -161,6 +168,10 @@ void clt_message_process(int fd, char *buf)
 		}
 		else
 			g_clients[id].state = CLIENT_STATE_INIT;
+		return;
+	}
+	else if(!strcmp(m.tokarr[m.cmd], "PONG")){
+		g_clients[id].pingsent = 0;
 		return;
 	}
 
