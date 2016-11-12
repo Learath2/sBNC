@@ -26,11 +26,12 @@ int core_run(void)
 {
 	int nfds = 0, s_server = 0, s_listener = 0;
 	bool running = true;
+	char rbuf[513] = "";
 
 	struct pollfd fds[MAX_SOCKETS];
 
 	store_init();
-	
+
 	s_server = srv_init();
 	if(srv_connect() == -1){
 		ERR("srv_connect() failed. Exiting...");
@@ -72,12 +73,11 @@ int core_run(void)
 					}
 				}
 				else{
-					char buffer[513];
 					int len = 0;
-					if((len = recv(fds[i].fd, buffer, sizeof buffer, 0)) < 0)
+					if((len = recv(fds[i].fd, rbuf + strlen(rbuf), sizeof rbuf - strlen(rbuf) - 1, 0)) < 0)
 						break;
-					buffer[len] = '\0'; //Ensure NULL Termination
-					proc_read(fds[i].fd, buffer);
+					rbuf[len] = '\0'; //Ensure NULL Termination
+					proc_read(fds[i].fd, rbuf, len);
 				}
 			}
 		}

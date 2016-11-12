@@ -1,6 +1,7 @@
 #define MODULE_NAME "proc"
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "util.h"
 #include "proc.h"
@@ -65,12 +66,36 @@ void proc_tick(void)
 	clt_tick();
 }
 
-void proc_read(int fd, char *buf)
+void proc_read(int fd, char *rbuf, size_t len)
 {
-	if(fd == srv_socket())
-		srv_message_process(buf);
-	else
-		clt_message_process(fd, buf);
+	char msg[513] = "";
+	size_t sz = sizeof msg;
+
+	while(len){
+		char *a = msg;
+		char *b = rbuf;
+		while(sz--){
+			char c = (*a++ = *b++);
+			if(!c || c == '\n')
+				break;
+		}
+
+		if(a[-1]){
+			a[0] = '\0'; //Ensure NULL termination
+			len -= (a - &msg[0]);
+			memmove(rbuf, b, len + 1);
+
+			if(fd == srv_socket())
+				srv_message_process(msg);
+			else
+				clt_message_process(fd, msg);
+		}
+		else{
+			util_strncpy(rbuf, msg, 513);
+			break;
+		}
+
+	}
 }
 
 #undef MODULE_NAME
