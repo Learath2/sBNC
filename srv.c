@@ -65,7 +65,9 @@ void srv_message_process(char *buf)
 
 	char *tmp = util_strdup(buf);
 	struct irc_message m = util_irc_message_parse(tmp);
-	bool me = !strcmp(m.prefix.nick, state_nick());
+	bool me = false;
+	if(m.prefix.nick)
+		me = !strcmp(m.prefix.nick, state_nick());
 
 	if(!strcmp(m.tokarr[m.cmd], "PING")){
 		srv_message_sendf("PONG :%s", m.tokarr[m.trailing] + 1);
@@ -78,13 +80,11 @@ void srv_message_process(char *buf)
 			else
 				break;
 		}
-		return;
 	}
 	else if(me && !strcmp(m.tokarr[m.cmd], "PART")){
 		for(int i = m.middle; i < m.ntok; i++)
 			if(m.tokarr[i][0] == '#' || m.tokarr[i][0] == '&')
 				state_channel_part(m.tokarr[i]);
-		return;
 	}
 	else if(me && !strcmp(m.tokarr[m.cmd], "004")){
 		state_server_umodes_set(m.tokarr[m.middle + 3]);
