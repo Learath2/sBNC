@@ -90,11 +90,8 @@ void proc_read(int fd, char *rbuf, size_t len)
 			else
 				clt_message_process(fd, msg);
 		}
-		else{
-			util_strncpy(rbuf, msg, 513);
+		else
 			break;
-		}
-
 	}
 }
 
