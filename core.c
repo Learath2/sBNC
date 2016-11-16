@@ -6,9 +6,11 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <string.h>
+#include <errno.h>
 
 #include "util.h"
 #include "core.h"
+#include "net.h"
 #include "srv.h"
 #include "clt.h"
 #include "proc.h"
@@ -24,15 +26,16 @@
 
 int core_run(void)
 {
-	int nfds = 0, s_server = 0, s_listener = 0;
+	int s_server = 0, s_listener = 0;
 	bool running = true;
-	char rbuf[513] = "";
 
 	struct pollfd fds[MAX_SOCKETS];
 
 	store_init();
 
-	s_server = srv_init();
+	if((s_server = srv_init()) < 0)
+		return EXIT_FAILURE;
+
 	if(srv_connect() == -1){
 		ERR("srv_connect() failed. Exiting...");
 		return EXIT_FAILURE;
@@ -45,48 +48,25 @@ int core_run(void)
 
 	memset(fds, 0 , sizeof(fds));
 
-	fds[LISTENER].fd 		= s_listener;
-	fds[LISTENER].events 	= POLLIN;
-
-	fds[SERVER].fd 			= s_server;
-	fds[SERVER].events		= POLLIN;
-
-	nfds = 2;
+	net_init();
+	net_poll_add(s_server, POLLIN);
+	net_poll_add_listener(s_listener, POLLIN);
 
 	while(running){
-		int res = poll(fds, nfds, POLLTIMEOUT);
-		if(res < 0){ //Poll failed
-			ERR("poll() failed. Exiting...");
-			running = false;
-			break;
-		}
-		else if(res != 0) { //Poll didn't timeout
-			int csize = nfds;
-			for(int i = 0; i < csize; i++){
-				if(!fds[i].revents)
-					continue;
-				else if(i == LISTENER){
-					int new = 0;
-					while((new = clt_accept()) > 0){ //TODO: Check if fds is full
-						fds[nfds].fd 		= new;
-						fds[nfds++].events 	= POLLIN;
-					}
-				}
-				else{
-					int len = 0;
-					if((len = recv(fds[i].fd, rbuf + strlen(rbuf), sizeof rbuf - strlen(rbuf) - 1, 0)) < 0)
-						break;
-					rbuf[len] = '\0'; //Ensure NULL Termination
-					proc_read(fds[i].fd, rbuf, len);
-				}
+		net_poll(POLLTIMEOUT);
+		proc_tick();
+
+		for(int i = 0; i < net_nfds(); i++){
+			while(net_socket_avail(i)){
+				char msg[513] = "";
+				net_socket_msg(i, msg, sizeof msg);
+				proc_proc(net_id2fd(i), msg);
 			}
 		}
 
-		proc_tick();
-
 		while(proc_wqueue_length()){
 			wqueue_entry_t ent = proc_wqueue_head();
-			write(ENT_GET(ent, target), ENT_GET(ent, data), ENT_GET(ent, datasz));
+			net_socket_write(ENT_GET(ent, target), ENT_GET(ent, data), ENT_GET(ent, datasz));
 			proc_wqueue_next();
 		}
 	}

@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <fcntl.h>
 
 #include "util.h"
 #include "state.h"
@@ -24,11 +25,14 @@ static srv_state_t g_state = SRV_STATE_OFFLINE;
 
 int srv_init(void)
 {
-	int re = 1;
+	INF("Initializing...");
 
 	g_socket = socket(AF_INET, SOCK_STREAM, 0);
-	setsockopt(g_socket, SOL_SOCKET, SO_REUSEADDR, &re, sizeof re);
-	ioctl(g_socket, FIONBIO, &re);
+
+	if(fcntl(g_socket, F_SETFL, fcntl(g_socket, F_GETFL, 0) | O_NONBLOCK) < 0){
+		ERR("fcntl() failed exiting...");
+		return -1;
+	}
 
 	return g_socket;
 }

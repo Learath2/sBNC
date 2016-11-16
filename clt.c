@@ -1,11 +1,11 @@
 #define MODULE_NAME "clt"
 
 #include <sys/socket.h>
-#include <sys/ioctl.h>
 #include <arpa/inet.h>
 #include <string.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <fcntl.h>
 
 #include "util.h"
 #include "clt.h"
@@ -33,10 +33,13 @@ int clt_clients_get_id(int fd)
 
 int clt_clients_add(int fd)
 {
+	if(fd < 0)
+		return fd;
+
 	for(int i = 0; i < MAX_CLIENTS; i++){
 		if(g_clients[i].fd == -1){
 			g_clients[i].fd = fd;
-			g_clients[i].state = CLIENT_STATE_INIT;
+			g_clients[i].state = CLIENT_STATE_REGISTER;
 			g_clients[i].needs_playback = (g_nclients++ == 0);
 			break;
 		}
@@ -62,14 +65,18 @@ void clt_clients_remove_fd(int fd)
 //TODO: Check for errors :P
 int clt_init(void)
 {
+	INF("Initializing...");
+
 	struct settings *s = sett_get();
 
 	struct sockaddr_in clt_addr;
-	int re = 1;
 
 	g_socket = socket(AF_INET, SOCK_STREAM, 0);
-	setsockopt(g_socket, SOL_SOCKET, SO_REUSEADDR, &re, sizeof re);
-	ioctl(g_socket, FIONBIO, &re);
+
+	if(fcntl(g_socket, F_SETFL, fcntl(g_socket, F_GETFL, 0) | O_NONBLOCK) < 0){
+		ERR("fcntl() failed exiting...");
+		return -1;
+	}
 
 	memset(&clt_addr, 0, sizeof clt_addr);
 	clt_addr.sin_family			= AF_INET;

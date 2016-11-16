@@ -5,6 +5,7 @@
 
 #include "util.h"
 #include "proc.h"
+#include "net.h"
 #include "log.h"
 #include "clt.h"
 #include "srv.h"
@@ -66,36 +67,12 @@ void proc_tick(void)
 	clt_tick();
 }
 
-void proc_read(int fd, char *rbuf, size_t len)
+void proc_proc(int fd, char *msg)
 {
-	char msg[513] = "";
-
-	while(len){
-		size_t sz = sizeof msg;
-		char *a = msg;
-		char *b = rbuf;
-		char c = '\0';
-
-		while(sz--){
-			c = (*a++ = *b++);
-			if(!c || c == '\r' || c == '\n')
-				break;
-		}
-		if(c == '\r') b++;
-
-		if(a[-1]){
-			a[-1] = '\0'; //Ensure NULL termination
-			len -= (a - &msg[0]);
-			memmove(rbuf, b, len + 1);
-
-			if(fd == srv_socket())
-				srv_message_process(msg);
-			else
-				clt_message_process(fd, msg);
-		}
-		else
-			break;
-	}
+	if(fd == srv_socket())
+		srv_message_process(msg);
+	else
+		clt_message_process(fd, msg);
 }
 
 #undef MODULE_NAME

@@ -14,6 +14,6 @@ void *proc_wqueue_entry_data(wqueue_entry_t d);
 size_t proc_wqueue_entry_datasz(wqueue_entry_t d);
 
 void proc_tick(void);
-void proc_read(int fd, char *buf, size_t len);
+void proc_proc(int fd, char *msg);
 
 #endif
