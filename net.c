@@ -48,9 +48,22 @@ int net_poll_add(int fd, short events)
 	g_buf[g_nfds][0] = '\0';
 
 	g_fds[g_nfds].fd = fd;
-	g_fds[g_nfds++].events = events;
+	g_fds[g_nfds].events = events;
 
-	return 0;
+	return g_nfds++;
+}
+
+int net_poll_remove(int id)
+{
+	int fd = net_id2fd(id);
+	memmove(&g_fds[id], &g_fds[id+1], (g_nfds - id -1) * sizeof (struct pollfd));
+	g_nfds--;
+	return shutdown(fd, SHUT_RDWR);
+}
+
+int net_poll_remove_fd(int fd)
+{
+	return net_poll_remove(net_fd2id(fd));
 }
 
 int net_poll(int timeout)
@@ -66,9 +79,9 @@ int net_poll(int timeout)
 			if(!g_fds[i].revents)
 				continue;
 			else if(i == gs_listener){
-				int new = 0;
-				while((new = clt_accept()) > 0) //TODO: Check if fds is full
-					net_poll_add(new, POLLIN);
+				while(true)
+					if(clt_accept() < 0)
+						break;
 			}
 			else{
 				net_socket_read(i);
@@ -83,6 +96,12 @@ int net_poll(int timeout)
 int net_socket_create(void)
 {
 	int s = socket(AF_INET, SOCK_STREAM, 0);
+	int re = 1;
+	if(setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &re, sizeof re) < 0){
+		ERR("setsockopt() failed exiting...");
+		return -1;
+	}
+
 	if(fcntl(s, F_SETFL, fcntl(s, F_GETFL, 0) | O_NONBLOCK) < 0){
 		ERR("fcntl() failed exiting...");
 		return -1;

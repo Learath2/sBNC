@@ -130,6 +130,9 @@ int main(int argc, char **argv)
 	sett_init();
 	process_args(&argc, &argv);
 	ALL("Running sBNC-"VERSION);
+
+	srand(time(NULL));
+
 	sett_dump();
 
 	exit(core_run());

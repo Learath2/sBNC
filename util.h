@@ -30,6 +30,7 @@ struct irc_message{
 void *util_dup(const void *src, size_t len);
 char *util_strdup(const char *src);
 void util_strncpy(char *dst, const char *src, size_t dstsz);
+void util_randstr(char *buf, size_t len, const char *alphabet);
 int util_clamp(int val, int min, int max);
 int util_tokenize(char *buf, char **tokarr, size_t toksize);
 struct irc_message util_irc_message_parse(char *msg);

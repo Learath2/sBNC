@@ -13,6 +13,8 @@
 
 void store_init(void)
 {
+	INF("Initializing...");
+
 	struct settings *s = sett_get();
 	util_mkdir_r(s->spath); //TODO: Implement this in platform.c
 }
@@ -31,7 +33,7 @@ void store_msg(char *msg)
 
 		util_irc_prefix_construct(buf, sizeof buf, m.prefix);
 		strcat(buf, ": ");
-		strcat(buf, m.tokarr[m.trailing] + 1);
+		strcat(buf, m.tokarr[m.trailing]);
 		store_store(path, buf);
 	}
 	else if(s->sjoin && (!strcmp(m.tokarr[m.cmd], "JOIN") || !strcmp(m.tokarr[m.cmd], "PART"))){

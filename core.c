@@ -32,6 +32,9 @@ int core_run(void)
 	struct pollfd fds[MAX_SOCKETS];
 
 	store_init();
+	net_init();
+
+	state_init();
 
 	if((s_server = srv_init()) < 0)
 		return EXIT_FAILURE;
@@ -48,7 +51,6 @@ int core_run(void)
 
 	memset(fds, 0 , sizeof(fds));
 
-	net_init();
 	net_poll_add(s_server, POLLIN);
 	net_poll_add_listener(s_listener, POLLIN);
 
@@ -60,7 +62,7 @@ int core_run(void)
 			while(net_socket_avail(i)){
 				char msg[513] = "";
 				net_socket_msg(i, msg, sizeof msg);
-				proc_proc(net_id2fd(i), msg);
+				proc_proc(i, msg);
 			}
 		}
 

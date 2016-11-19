@@ -5,6 +5,8 @@ int net_nfds(void);
 int net_init(void);
 int net_poll_add_listener(int fd, short events);
 int net_poll_add(int fd, short events);
+int net_poll_remove(int id);
+int net_poll_remove_fd(int fd);
 int net_poll(int timeout);
 int net_socket_create(void);
 int net_fd2id(int fd);

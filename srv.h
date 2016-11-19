@@ -15,6 +15,6 @@ srv_state_t srv_state(void);
 int srv_socket(void);
 void srv_message_process(char *buf);
 void srv_message_sendf(const char *format, ... );
-void srv_message_send(char *data, size_t datasz);
+void srv_message_send(const char *data);
 
 #endif

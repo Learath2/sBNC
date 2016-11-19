@@ -1,6 +1,7 @@
 #ifndef STATE_H_
 #define STATE_H_
 
+void state_init(void);
 bool state_nick_set(char *nick);
 const char *state_nick(void);
 const char *state_server_umodes(void);

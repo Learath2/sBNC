@@ -40,6 +40,15 @@ int util_clamp(int val, int min, int max)
 	return val;
 }
 
+void util_randstr(char *buf, size_t len, const char *alphabet)
+{
+	int alphalen = strlen(alphabet);
+
+	while(len--)
+		*buf++=alphabet[rand()%alphalen];
+	*buf = '\0';
+}
+
 int util_tokenize(char *buf, char **tokarr, size_t toksize)
 {
 	if(buf[0] == ' ') //Cant begin with whitespace
@@ -49,6 +58,8 @@ int util_tokenize(char *buf, char **tokarr, size_t toksize)
 
 	while(*buf && ntok < toksize){
 		tokarr[ntok++] = buf;
+		if(ntok > 1 && *buf == ':')
+			break;
 		while(*buf && *buf != ' ') buf++;
 		if(!*buf)
 			break;
@@ -62,6 +73,8 @@ int util_tokenize(char *buf, char **tokarr, size_t toksize)
 struct irc_message util_irc_message_parse(char *msg)
 {
 	struct irc_message r;
+	for(int i = 0; i < MAX_TOKENS; i++)
+		r.tokarr[i] = NULL;
 
 	r.ntok = util_tokenize(msg, r.tokarr, COUNT_OF(r.tokarr));
 
@@ -76,6 +89,9 @@ struct irc_message util_irc_message_parse(char *msg)
 	r.cmd = (r.prefix.nick) ? 1 : 0;
 	r.middle = r.cmd + 1;
 	r.trailing = (r.tokarr[r.ntok - 1][0] == ':') ? r.ntok - 1 : -1;
+
+	if(r.trailing)
+		r.tokarr[r.trailing]++;
 
 	return r;
 }

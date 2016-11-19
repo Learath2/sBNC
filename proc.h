@@ -5,7 +5,7 @@ typedef struct wqueue_entry *wqueue_entry_t;
 
 #define ENT_GET(ENTRY, FIELD) proc_wqueue_entry_##FIELD(ENTRY)
 
-void proc_wqueue_add(int target, void *data, size_t datasz);
+void proc_wqueue_add(int target, const char *data);
 void proc_wqueue_next(void);
 size_t proc_wqueue_length(void);
 wqueue_entry_t proc_wqueue_head(void);

@@ -65,7 +65,7 @@ int srv_socket(void){ return g_socket; }
 
 void srv_message_process(char *buf)
 {
-	INFF("%s", buf);
+	INFF("<-%s", buf);
 
 	char *tmp = util_strdup(buf);
 	struct irc_message m = util_irc_message_parse(tmp);
@@ -74,7 +74,7 @@ void srv_message_process(char *buf)
 		me = !strcmp(m.prefix.nick, state_nick());
 
 	if(!strcmp(m.tokarr[m.cmd], "PING")){
-		srv_message_sendf("PONG :%s", m.tokarr[m.trailing] + 1);
+		srv_message_sendf("PONG :%s", m.tokarr[m.trailing]);
 		return;
 	}
 	else if(me && !strcmp(m.tokarr[m.cmd], "JOIN")){
@@ -105,7 +105,7 @@ void srv_message_process(char *buf)
 	}
 	free(tmp);
 
-	clt_message_send(-1, buf, strlen(buf));
+	clt_message_send(-1, buf);
 }
 
 void srv_message_sendf(const char *format, ... )
@@ -117,14 +117,17 @@ void srv_message_sendf(const char *format, ... )
 	va_end(args);
 
 	if(n > 0 && n < sizeof buf)
-		srv_message_send(buf, n);
+		srv_message_send(buf);
 }
 
-void srv_message_send(char *data, size_t datasz)
+void srv_message_send(const char *data)
 {
+	INFF("->%s", data);
 	char buf[513];
-	snprintf(buf, sizeof buf, "%s\r\n", data);
-	proc_wqueue_add(g_socket, buf, datasz + 2);
+	util_strncpy(buf, data, sizeof buf);
+	strcat(buf, "\r\n"); //GET util_strncat
+
+	proc_wqueue_add(g_socket, buf);
 }
 
 #undef MODULE_NAME

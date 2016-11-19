@@ -2,6 +2,7 @@
 
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <poll.h>
 #include <string.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -9,6 +10,7 @@
 
 #include "util.h"
 #include "clt.h"
+#include "net.h"
 #include "sett.h"
 #include "srv.h"
 #include "proc.h"
@@ -23,43 +25,45 @@ static int g_socket = -1;
 static int g_nclients = 0;
 static struct client g_clients[MAX_CLIENTS];
 
-int clt_clients_get_id(int fd)
+int clt_clients_nid2cid(int nid)
 {
 	for(int i = 0; i < MAX_CLIENTS; i++)
-		if(g_clients[i].fd == fd)
+		if(g_clients[i].nid == nid)
 			return i;
 	return -1;
 }
 
-int clt_clients_add(int fd)
+int clt_clients_add(int nid)
 {
-	if(fd < 0)
-		return fd;
+	if(nid < 0)
+		return nid;
 
 	for(int i = 0; i < MAX_CLIENTS; i++){
-		if(g_clients[i].fd == -1){
-			g_clients[i].fd = fd;
+		if(g_clients[i].nid == -1){
+			g_clients[i].nid = nid;
 			g_clients[i].state = CLIENT_STATE_REGISTER;
 			g_clients[i].needs_playback = (g_nclients++ == 0);
 			break;
 		}
 	}
-	return fd;
+	return nid;
 }
 
-void clt_clients_remove_id(int id)
+void clt_clients_remove_cid(int cid)
 {
-	g_clients[id].fd = -1;
-	g_clients[id].state = CLIENT_STATE_EMPTY;
-	if(g_nclients-- == 1)
+	g_clients[cid].nid = -1;
+	g_clients[cid].state = CLIENT_STATE_EMPTY;
+	if(g_nclients-- == 1){
+		INF("no clients left marking away.");
 		state_mark_away();
+	}
 
-	shutdown(g_clients[id].fd, 2);
+	net_poll_remove(g_clients[cid].nid);
 }
 
-void clt_clients_remove_fd(int fd)
+void clt_clients_remove_nid(int nid)
 {
-	clt_clients_remove_id(clt_clients_get_id(fd));
+	clt_clients_remove_cid(clt_clients_nid2cid(nid));
 }
 
 //TODO: Check for errors :P
@@ -89,28 +93,33 @@ int clt_init(void)
 	listen(g_socket, BACKLOG);
 
 	for(int i = 0; i < MAX_CLIENTS; i++){
-		g_clients[i].fd = -1;
+		g_clients[i].nid = -1;
 		g_clients[i].state = CLIENT_STATE_EMPTY;
 		g_clients[i].lastact = 0;
-		g_clients[i].pingsent = 9;
+		g_clients[i].pingsent = 0;
+		g_clients[i].regping[0] = '\0';
 	}
 	return g_socket;
 }
 
 void clt_tick(void)
 {
-	#define SF(...) clt_message_sendf(i, __VA_ARGS__)
+	#define SF(FMT, ...) clt_message_sendf(i, FMT, __VA_ARGS__)
 	#define SN(DATA, SZ) clt_message_send(i, DATA, SZ)
 
 	struct settings *s = sett_get();
 
 	for(int i = 0; i < MAX_CLIENTS; i++){
-		switch (g_clients[i].state) {
+		switch (g_clients[i].state){
 			case CLIENT_STATE_EMPTY:
 				continue;
 			case CLIENT_STATE_REGISTER:
 				break;
+			case CLIENT_STATE_REGISTERED:
+				break;
 			case CLIENT_STATE_INIT:
+				if(g_clients[i].regping[0])
+					break;
 				SF(":%s 001 %s :Welcome to sBNC, %s", s->host, state_nick(), state_nick());
 				SF(":%s 002 %s :Your host is %s, running version "VERSION, s->host, state_nick(), s->host);
 				SF(":%s 003 %s :This server was created %s", s->host, state_nick(), s->epoch);
@@ -123,7 +132,7 @@ void clt_tick(void)
 				break;
 			case CLIENT_STATE_READY:
 				if(g_clients[i].pingsent && time(NULL) - g_clients[i].pingsent > 30)
-					clt_clients_remove_id(i);
+					clt_clients_remove_cid(i);
 
 				if(!g_clients[i].pingsent && time(NULL) - g_clients[i].lastping > s->hbeat){
 					SF(":%s PING :%s", s->host, s->host);
@@ -146,43 +155,73 @@ int clt_accept(void)
 {
 	if(g_nclients == MAX_CLIENTS)
 		return -2;
-	return clt_clients_add(accept(g_socket, NULL, NULL));
+	int new = accept(g_socket, NULL, NULL);
+	if(new < 0)
+		return -1;
+	else{
+		clt_clients_add(net_poll_add(new, POLLIN));
+		return new;
+	}
 }
 
-void clt_message_process(int fd, char *buf)
+void clt_message_process(int nid, char *buf)
 {
-	int id = clt_clients_get_id(fd);
-	INFF("{%d}%s", id, buf);
+	int cid = clt_clients_nid2cid(nid);
+	struct client *c = &g_clients[cid];
 
-	g_clients[id].lastact = time(NULL);
+	INFF("<-{%d}%s", cid, buf);
+
+	c->lastact = time(NULL);
 
 	struct settings *s = sett_get();
 
 	char *tmp = util_strdup(buf);
 	struct irc_message m = util_irc_message_parse(tmp);
 
-	if(s->pass && !strcmp(m.tokarr[m.cmd], "PASS")){
-		g_clients[id].auth = !strcmp(m.tokarr[m.middle], s->pass);
+	if(s->pass[0] != '\0' && !strcmp(m.tokarr[m.cmd], "PASS")){
+		if(c->state < CLIENT_STATE_REGISTERED)
+			c->auth = !strcmp(m.tokarr[m.middle], s->pass);
+		else
+			clt_message_sendf(cid, ":%s 462 %s :Connection already registered", s->host, state_nick());
 		return;
 	}
-	else if(!strcmp(m.tokarr[m.cmd], "NICK"))
+	else if(!strcmp(m.tokarr[m.cmd], "NICK")){
+		c->state = CLIENT_STATE_REGISTERED;
+		util_randstr(c->regping, sizeof c->regping - 1, "0123456789");
+		clt_message_sendf(cid, "PING :%s", c->regping);
 		return;
+	}
 	else if(!strcmp(m.tokarr[m.cmd], "USER")){
-		g_clients[id].username = util_strdup(m.tokarr[m.middle]);
-		if(s->pass && !g_clients[id].auth){
-			clt_message_sendf(id, ":%s 464 %s :Password incorrect");
-			clt_clients_remove_id(id);
+		if(c->state < CLIENT_STATE_INIT){
+			if(s->pass[0] != '\0' && !c->auth){
+				clt_message_sendf(cid, ":%s 464 %s :Password incorrect", s->host, state_nick());
+				clt_clients_remove_cid(cid);
+			}
+			else{
+				c->username = util_strdup(m.tokarr[m.middle]);
+				c->state = CLIENT_STATE_INIT;
+			}
 		}
-		else
-			g_clients[id].state = CLIENT_STATE_INIT;
 		return;
 	}
 	else if(!strcmp(m.tokarr[m.cmd], "PONG")){
-		g_clients[id].pingsent = 0;
+		if(c->state < CLIENT_STATE_INIT){
+			if(!strcmp(m.tokarr[m.trailing], c->regping))
+				c->regping[0] = '\0';
+			else
+				clt_message_sendf(cid, "Send \"PONG :%s\" to register", c->regping);
+		}
+		else
+			c->pingsent = 0;
+		return;
+	}
+	else if(!strcmp(m.tokarr[m.cmd], "QUIT")){
+		INFF("client disconnected. cid=%d", cid);
+		clt_clients_remove_cid(cid);
 		return;
 	}
 
-	srv_message_send(buf, strlen(buf));
+	srv_message_send(buf);
 }
 
 void clt_message_sendf(int id, const char *format, ... )
@@ -194,17 +233,23 @@ void clt_message_sendf(int id, const char *format, ... )
 	va_end(args);
 
 	if(n < sizeof buf)
-		clt_message_send(id, buf, n);
+		clt_message_send(id, buf);
 }
 
-void clt_message_send(int id, void *data, size_t datasz)
+void clt_message_send(int cid, const char *data)
 {
-	if(id > 0)
-		proc_wqueue_add(g_clients[id].fd, data, datasz);
+	INFF("->{%d}%s", cid, (char *)data);
+
+	char buf[513];
+	util_strncpy(buf, data, sizeof buf);
+	strcat(buf, "\r\n"); //GET util_strncat which checks for bounds
+
+	if(cid > 0)
+		proc_wqueue_add(net_id2fd(g_clients[cid].nid), buf);
 	else
 		for(int i = 0; i < MAX_CLIENTS; i++)
-			if(g_clients[i].fd != -1)
-				proc_wqueue_add(g_clients[i].fd, data, datasz);
+			if(g_clients[i].nid != -1)
+				proc_wqueue_add(net_id2fd(g_clients[i].nid), buf);
 }
 
 #undef MODULE_NAME

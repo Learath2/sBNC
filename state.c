@@ -34,6 +34,14 @@ static bool g_away = false;
 struct channel g_channels[MAX_CHANNELS] = {{"", NULL, 0}};
 int g_nchannels = 0;
 
+void state_init(void)
+{
+	INF("Initializing...");
+
+	struct settings *s = sett_get();
+	state_nick_set(s->nick);
+}
+
 bool state_nick_set(char *nick)
 {
 	if(strlen(nick) > 9)
@@ -69,7 +77,7 @@ void state_server_005_store(char *s)
 void state_server_005(int id)
 {
 	for(int i = 0; i < g_n005; i++)
-		clt_message_send(id, g_005[i], strlen(g_005[i]));
+		clt_message_send(id, g_005[i]);
 }
 
 void state_channel_join(char *chan)
@@ -152,7 +160,7 @@ void state_buffer_play(int clid)
 	for(int i = 0; i < MAX_CHANNELS; i++){
 		struct channel *c = &g_channels[i];
 		for(int j = 0; j < c->buffer_cur; j++)
-			clt_message_send(clid, &c->buffer[j], strlen(&c->buffer[j]));
+			clt_message_send(clid, &c->buffer[j]);
 	}
 }
 

@@ -13,7 +13,7 @@
 struct wqueue_entry
 {
 	int target;
-	void *data;
+	char *data;
 	size_t datasz;
 	struct wqueue_entry *next;
 };
@@ -27,12 +27,12 @@ struct wqueue
 
 static struct wqueue g_wqueue = {0};
 
-void proc_wqueue_add(int target, void *data, size_t datasz)
+void proc_wqueue_add(int target, const char *data)
 {
 	struct wqueue_entry *e = malloc(sizeof *e);
 	e->target = target;
-	e->data = util_dup(data, datasz);
-	e->datasz = datasz;
+	e->data = util_strdup(data);
+	e->datasz = strlen(data);
 	e->next = NULL;
 
 	if(!g_wqueue.head)
@@ -67,12 +67,12 @@ void proc_tick(void)
 	clt_tick();
 }
 
-void proc_proc(int fd, char *msg)
+void proc_proc(int nid, char *msg)
 {
-	if(fd == srv_socket())
+	if(net_id2fd(nid) == srv_socket())
 		srv_message_process(msg);
 	else
-		clt_message_process(fd, msg);
+		clt_message_process(nid, msg);
 }
 
 #undef MODULE_NAME
