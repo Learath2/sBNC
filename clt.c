@@ -96,6 +96,7 @@ int clt_init(void)
 		g_clients[i].nid = -1;
 		g_clients[i].state = CLIENT_STATE_EMPTY;
 		g_clients[i].lastact = 0;
+		g_clients[i].lastpong = 0;
 		g_clients[i].pingsent = 0;
 		g_clients[i].regping[0] = '\0';
 	}
@@ -128,16 +129,17 @@ void clt_tick(void)
 				srv_message_sendf("LUSERS"); //Need to route the replies somehow
 				srv_message_sendf("MOTD");   //ditto
 				state_channel_client_init(i);
+				g_clients[i].lastpong = time(NULL);
 				g_clients[i].state = CLIENT_STATE_READY;
 				break;
 			case CLIENT_STATE_READY:
-				if(g_clients[i].pingsent && time(NULL) - g_clients[i].pingsent > 30)
-					clt_clients_remove_cid(i);
-
-				if(!g_clients[i].pingsent && time(NULL) - g_clients[i].lastping > s->hbeat){
+				if(time(NULL) - g_clients[i].lastpong > s->hbeat){
 					SF(":%s PING :%s", s->host, s->host);
 					g_clients[i].pingsent = time(NULL);
 				}
+
+				if(g_clients[i].lastpong > g_clients[i].pingsent && time(NULL) - g_clients[i].pingsent > 30)
+					clt_clients_remove_cid(i);
 
 				if(g_clients[i].needs_playback){
 					state_buffer_play(i);
@@ -205,14 +207,14 @@ void clt_message_process(int nid, char *buf)
 		return;
 	}
 	else if(!strcmp(m.tokarr[m.cmd], "PONG")){
-		if(c->state < CLIENT_STATE_INIT){
+		if(c->state <= CLIENT_STATE_INIT){
 			if(!strcmp(m.tokarr[m.trailing], c->regping))
 				c->regping[0] = '\0';
 			else
 				clt_message_sendf(cid, "Send \"PONG :%s\" to register", c->regping);
 		}
 		else
-			c->pingsent = 0;
+			c->lastpong = time(NULL);
 		return;
 	}
 	else if(!strcmp(m.tokarr[m.cmd], "QUIT")){

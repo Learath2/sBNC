@@ -76,7 +76,7 @@ void log_log(int lvl, const char *fmt, ...)
 		strcat(result, data);
 	}
 	else
-		sprintf(result, "[%ld]%s\n", time(NULL), data);
+		sprintf(result, "[%llu]%s\n", time(NULL), data);
 
 	if(lvl <= g_cverb){
 		FILE *str = (lvl < LOGGER_INFO) ? stderr : stdout;

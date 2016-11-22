@@ -20,7 +20,7 @@ struct client{
 	bool needs_playback;
 	char regping[11];
 
-	time_t lastping;
+	time_t lastpong;
 	time_t pingsent;
 };
 
