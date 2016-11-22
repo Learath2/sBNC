@@ -138,7 +138,7 @@ void clt_tick(void)
 					g_clients[i].pingsent = time(NULL);
 				}
 
-				if(g_clients[i].lastpong > g_clients[i].pingsent && time(NULL) - g_clients[i].pingsent > 30)
+				if(g_clients[i].lastpong < g_clients[i].pingsent && time(NULL) - g_clients[i].pingsent > 30)
 					clt_clients_remove_cid(i);
 
 				if(g_clients[i].needs_playback){
@@ -213,8 +213,7 @@ void clt_message_process(int nid, char *buf)
 			else
 				clt_message_sendf(cid, "Send \"PONG :%s\" to register", c->regping);
 		}
-		else
-			c->lastpong = time(NULL);
+		c->lastpong = time(NULL);
 		return;
 	}
 	else if(!strcmp(m.tokarr[m.cmd], "QUIT")){
