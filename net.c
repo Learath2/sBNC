@@ -58,7 +58,7 @@ int net_poll_remove(int id)
 	int fd = net_id2fd(id);
 	memmove(&g_fds[id], &g_fds[id+1], (g_nfds - id -1) * sizeof (struct pollfd));
 	g_nfds--;
-	return shutdown(fd, SHUT_RDWR);
+	return close(fd);
 }
 
 int net_poll_remove_fd(int fd)

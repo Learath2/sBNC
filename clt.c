@@ -25,6 +25,19 @@ static int g_socket = -1;
 static int g_nclients = 0;
 static struct client g_clients[MAX_CLIENTS];
 
+void clt_clients_cinit(int cid)
+{
+	g_clients[cid].nid = -1;
+	g_clients[cid].state = CLIENT_STATE_EMPTY;
+	g_clients[cid].lastact = 0;
+	g_clients[cid].auth = false;
+	g_clients[cid].username = NULL;
+	g_clients[cid].nickname = NULL;
+	g_clients[cid].needs_playback = false;
+	g_clients[cid].ping[0] = '\0';
+	g_clients[cid].pingsent = 0;
+}
+
 int clt_clients_nid2cid(int nid)
 {
 	for(int i = 0; i < MAX_CLIENTS; i++)
@@ -41,7 +54,7 @@ int clt_clients_add(int nid)
 	for(int i = 0; i < MAX_CLIENTS; i++){
 		if(g_clients[i].nid == -1){
 			g_clients[i].nid = nid;
-			g_clients[i].state = CLIENT_STATE_REGISTER;
+			g_clients[i].state = CLIENT_STATE_REGISTERING;
 			g_clients[i].needs_playback = (g_nclients++ == 0);
 			break;
 		}
@@ -51,14 +64,14 @@ int clt_clients_add(int nid)
 
 void clt_clients_remove_cid(int cid)
 {
-	g_clients[cid].nid = -1;
-	g_clients[cid].state = CLIENT_STATE_EMPTY;
+	net_poll_remove(g_clients[cid].nid);
+
+	clt_clients_cinit(cid);
+
 	if(g_nclients-- == 1){
 		INF("no clients left marking away.");
 		state_mark_away();
 	}
-
-	net_poll_remove(g_clients[cid].nid);
 }
 
 void clt_clients_remove_nid(int nid)
@@ -92,35 +105,35 @@ int clt_init(void)
 
 	listen(g_socket, BACKLOG);
 
-	for(int i = 0; i < MAX_CLIENTS; i++){
-		g_clients[i].nid = -1;
-		g_clients[i].state = CLIENT_STATE_EMPTY;
-		g_clients[i].lastact = 0;
-		g_clients[i].lastpong = 0;
-		g_clients[i].pingsent = 0;
-		g_clients[i].regping[0] = '\0';
-	}
+	for(int i = 0; i < MAX_CLIENTS; i++)
+		clt_clients_cinit(i);
+
 	return g_socket;
 }
 
 void clt_tick(void)
 {
 	#define SF(FMT, ...) clt_message_sendf(i, FMT, __VA_ARGS__)
-	#define SN(DATA, SZ) clt_message_send(i, DATA, SZ)
+	#define SN(DATA) clt_message_send(i, DATA)
 
 	struct settings *s = sett_get();
 
 	for(int i = 0; i < MAX_CLIENTS; i++){
-		switch (g_clients[i].state){
+		struct client *c = &g_clients[i];
+		switch (c->state){
 			case CLIENT_STATE_EMPTY:
 				continue;
-			case CLIENT_STATE_REGISTER:
-				break;
-			case CLIENT_STATE_REGISTERED:
+			case CLIENT_STATE_REGISTERING:
+				if(!c->username || !c->nickname || c->ping[0])
+					continue;
+				else
+					c->state = CLIENT_STATE_INIT;
 				break;
 			case CLIENT_STATE_INIT:
-				if(g_clients[i].regping[0])
-					break;
+				if(s->pass[0] != '\0' && !c->auth){
+					SN("ERROR :Access denied: Bad password?");
+					clt_clients_remove_cid(i);
+				}
 				SF(":%s 001 %s :Welcome to sBNC, %s", s->host, state_nick(), state_nick());
 				SF(":%s 002 %s :Your host is %s, running version "VERSION, s->host, state_nick(), s->host);
 				SF(":%s 003 %s :This server was created %s", s->host, state_nick(), s->epoch);
@@ -129,21 +142,19 @@ void clt_tick(void)
 				srv_message_sendf("LUSERS"); //Need to route the replies somehow
 				srv_message_sendf("MOTD");   //ditto
 				state_channel_client_init(i);
-				g_clients[i].lastpong = time(NULL);
-				g_clients[i].state = CLIENT_STATE_READY;
+				c->state = CLIENT_STATE_READY;
 				break;
 			case CLIENT_STATE_READY:
-				if(time(NULL) - g_clients[i].lastpong > s->hbeat){
-					SF(":%s PING :%s", s->host, s->host);
-					g_clients[i].pingsent = time(NULL);
+				if(!c->ping[0] && time(NULL) - c->pingsent > s->hbeat)
+					clt_ping_send(i, 10);
+				if(c->ping[0] && time(NULL) - c->pingsent > 30){
+					INFF("Removing client: %d. Failed to respond to ping sent on: %llu", i, c->pingsent);
+					clt_clients_remove_cid(i);
 				}
 
-				if(g_clients[i].lastpong < g_clients[i].pingsent && time(NULL) - g_clients[i].pingsent > 30)
-					clt_clients_remove_cid(i);
-
-				if(g_clients[i].needs_playback){
+				if(c->needs_playback){
 					state_buffer_play(i);
-					g_clients[i].needs_playback = false;
+					c->needs_playback = false;
 				}
 				break;
 		}
@@ -166,6 +177,25 @@ int clt_accept(void)
 	}
 }
 
+void clt_ping_send(int cid, int len)
+{
+	struct client *c = &g_clients[cid];
+
+	util_randstr(c->ping, len, "0123456789");
+	clt_message_sendf(cid, "PING :%s", c->ping);
+	c->pingsent = time(NULL);
+}
+
+void clt_ping_check(int cid, const char *pong)
+{
+	struct client *c = &g_clients[cid];
+
+	if(!strcmp(c->ping, pong))
+		c->ping[0] = '\0';
+	else
+		clt_ping_send(cid, strlen(c->ping));
+}
+
 void clt_message_process(int nid, char *buf)
 {
 	int cid = clt_clients_nid2cid(nid);
@@ -181,39 +211,24 @@ void clt_message_process(int nid, char *buf)
 	struct irc_message m = util_irc_message_parse(tmp);
 
 	if(s->pass[0] != '\0' && !strcmp(m.tokarr[m.cmd], "PASS")){
-		if(c->state < CLIENT_STATE_REGISTERED)
+		if(!c->nickname)
 			c->auth = !strcmp(m.tokarr[m.middle], s->pass);
 		else
 			clt_message_sendf(cid, ":%s 462 %s :Connection already registered", s->host, state_nick());
 		return;
 	}
-	else if(!strcmp(m.tokarr[m.cmd], "NICK")){
-		c->state = CLIENT_STATE_REGISTERED;
-		util_randstr(c->regping, sizeof c->regping - 1, "0123456789");
-		clt_message_sendf(cid, "PING :%s", c->regping);
+	else if(!strcmp(m.tokarr[m.cmd], "NICK")){ //Add a way to actually change the nickname on the run
+		c->nickname = util_strdup(m.tokarr[m.middle]); //Free this
+		clt_ping_send(cid, 10);
 		return;
 	}
 	else if(!strcmp(m.tokarr[m.cmd], "USER")){
-		if(c->state < CLIENT_STATE_INIT){
-			if(s->pass[0] != '\0' && !c->auth){
-				clt_message_sendf(cid, ":%s 464 %s :Password incorrect", s->host, state_nick());
-				clt_clients_remove_cid(cid);
-			}
-			else{
-				c->username = util_strdup(m.tokarr[m.middle]);
-				c->state = CLIENT_STATE_INIT;
-			}
-		}
+		if(c->state < CLIENT_STATE_INIT)
+			c->username = util_strdup(m.tokarr[m.middle]); //Free this
 		return;
 	}
 	else if(!strcmp(m.tokarr[m.cmd], "PONG")){
-		if(c->state <= CLIENT_STATE_INIT){
-			if(!strcmp(m.tokarr[m.trailing], c->regping))
-				c->regping[0] = '\0';
-			else
-				clt_message_sendf(cid, "Send \"PONG :%s\" to register", c->regping);
-		}
-		c->lastpong = time(NULL);
+		clt_ping_check(cid, m.tokarr[m.trailing]);
 		return;
 	}
 	else if(!strcmp(m.tokarr[m.cmd], "QUIT")){
